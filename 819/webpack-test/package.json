@@ -1,0 +1,27 @@
+{
+  "name": "webpack-15085",
+  "version": "1.0.0",
+  "description": "1. 克隆工程`https://rdc.hand-china.com/gitlab/train-front-end/webpack-test.git`并切换分支，分支名为工号 \r 2. 初始化npm，命名webpack-工号 \r 3. 安装webpack、webpack-dev-server为开发依赖\r 4. 创建目录src，在目录下创建index.js、index.css、index.tplt.html\r 5. 建立名为start的npm脚本，能够使用webpack-dev-server打包并启动服务，服务端口号9090\r 6. 发布到npm库，地址`https://nexus.choerodon.com.cn/repository/train-npm/`\r 7. 提交代码到gitlab",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "rimraf dist && webpack && webpack-dev-server --open",
+    "build": "gulp webpack"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://rdc.hand-china.com/gitlab/train-front-end/webpack-test.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "css-loader": "^1.0.0",
+    "extract-text-webpack-plugin": "^3.0.2",
+    "file-loader": "^1.1.11",
+    "html-webpack-plugin": "^3.2.0"
+  },
+  "devDependencies": {
+    "webpack": "^3.12.0",
+    "webpack-dev-server": "^2.9.1"
+  }
+}
