@@ -1,10 +1,16 @@
-### 要求
+# 故事地图滚动部分实现备忘和思路整理
+
+## 要求样式
+
+![scroll_1](./screenshot/scroll_1.png)
+
+## 要求
 
 - 上部史诗头部，不可垂直滚动，可水平滚动（但不出现滚动条）
-- 下部面板部分可水平滚动，并有滚动条，当水平滚动时，头部跟随滚动，且买部分标题不动
+- 下部面板部分可水平滚动，并有滚动条，当水平滚动时，头部跟随滚动，且标题不动
 - 下部面板部分可垂直滚动，且最上标题栏会根据当前位置更新
 
-### 布局实现
+## 布局实现
 
 这是典型的`表格表头不动，表体可动`布局，先用类似布局方式实现后，着重处理滚动事件。
 
@@ -95,16 +101,20 @@ handleScroll = (e) => {
   if (scrollTop !== top) {
     const { offsetTops, currentIndex } = UserMapStore;
     UserMapStore.setTop(scrollTop);
+    window.console.log('when scroll, the scrollTop is: ' + scrollTop);
     const index = _.findLastIndex(offsetTops, v => v < scrollTop);
     if (currentIndex !== index) {
       UserMapStore.setCurrentIndex(index);
-      window.console.log(index);
     }
   }
 };
 ```
 
-这时候出现了一个问题，通过在处理垂直部分打印出scrollTop发现，当快速滚动到头时，scrollTop不总是0（事实上，很少出现0），一开始测试发现经常为一个较小的值，所以加入了判断，当scrollTop <= 9时就理解为滚动到头了，这时候又发现如果大幅滚动，这个值可能很大（可能为500多），这样这个方法就不能用了。
+这时候出现了一个问题，通过在处理垂直部分打印出scrollTop发现，当快速滚动到头时，scrollTop不总是0（事实上，很少出现0），这样导致的问题是，用户快速滚动到顶部了，顶部的标题却不是第一块的标题。
+
+![scroll_2](./screenshot/scroll_2.png)
+
+打印scrollTop测试，一开始测试发现经常为一个较小的值，所以加入了判断，当scrollTop <= 9时就理解为滚动到头了，修改后又发现如果大幅滚动，这个值可能很大（可能为500多，上图为17），这样这个方法就不能用了。
 
 ### 解决
 
@@ -142,7 +152,17 @@ handleScroll = (e) => {
 };
 ```
 
-这时候却又出现了不为0的情况，那么说明这个if判断是导致问题的关键（虽然不知原因）。而这里除了垂直就是水平，把if换成else
+这时候却又出现了不为0的情况，那么说明这个if判断是导致问题的关键（~~虽然不知原因~~）。而这里除了垂直就是水平，把if换成else
+
+后来补充：
+
+将上述if中条件换为
+
+- [].length === 0
+- true
+- scrollTop !== null
+
+ 时，皆能正确打印0，可以得出是store中的top中的值的更新时间导致，但下面方案的思路也是正确的，没有必要缓存这个top值到store，因为他并不影响渲染。
 
 ```
 handleScroll = (e) => {
