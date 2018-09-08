@@ -30,9 +30,9 @@ function toFullScreen(dom) {
 
 ```
 fullScreen = () => {
-    const target = document.querySelector('.content');
-    toFullScreen(target);
-  };
+  const target = document.querySelector('.content');
+  toFullScreen(target);
+};
 ```
 
 调用。
@@ -57,7 +57,7 @@ function exitFullScreen() {
 
 ## 判断当前是否处于全屏状态
 
-由于设计到同个按钮，则点击时要判断是否处于全屏，并且切换状态。
+由于涉及到同个按钮，则点击时要判断是否处于全屏，并且切换状态。
 
 ```
 const isFullScreen = document.webkitFullscreenElement
@@ -72,6 +72,17 @@ const isFullScreen = document.webkitFullscreenElement
 联想到有时候滚动时弹出层会脱离滚动，可以猜测出弹出层是“绑定”到某个结点的，查看api发现默认是body结点。
 
 而react项目又是在app标签中的，这样app标签和弹出层是平等的结点，所以全屏某个结点时，弹出层在下面正常执行而不在全屏里显示。
+
+```
+<body>
+  <div id="app">
+    // our code here
+  </app>
+  <div>
+    // popover here
+  </div>
+</body>
+```
 
 ### 解决方法
 
@@ -104,7 +115,7 @@ getContainer = () => {
 
 ```
   // Portal.js
-  // 这个函数就像我们刚才上面所提到的Potal组件的一个编写，非常有用
+  // 这个函数是Potal组件的一个编写，非常有用
   // 可以利用这个组件创建在一些我们所需要创建组件的地方，比如在body节点创建
   // 模态框，或者在窗口节点创建fixed的定位的弹出框之类的。
   // 这个组件在componentWillUnmount时一定要将节点移除
