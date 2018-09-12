@@ -1,0 +1,76 @@
+<html>
+  <style>
+    .card {
+      position: relative;
+      max-width: 360px;
+      transition: transform .15s ease-out;
+      box-shadow: 3px 4px 10px 0px rgba(0, 0, 0, 0.2);
+    }
+
+    .card:hover {
+      transform: scale(1.01);
+    }
+
+    .card--blurry {
+      /* transform: translateZ(0); */
+      will-change: transform;
+    }
+
+    figure {
+      background: white;
+      margin: 0;
+    }
+
+    .text-wrap {
+      padding: 9%;
+    }
+
+    body {
+      background-color: #f9f9f9;
+      margin: 20px;
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+    }
+
+    p {
+      color: #848484;
+    }
+  </style>
+  <body>
+      <h2>Scale and layer promote</h2>
+      <div class="card card--blurry">
+        <figure>
+          <div class="img-wrap">
+            <img src="https://placehold.it/360x150">
+          </div>
+          <figcaption class="text-wrap">
+            <h3>Blurry</h3>
+            <p>Swag gentrify fashion axe Etsy, pork belly iPhone asymmetrical church-key occupy artisan. Deep v pour-over Pinterest stumptown, kale chips Marfa letterpress fixie church-key Kickstarter. Single-origin coffee Banksy locavore gluten-free lo-fi polaroid.</p>
+            <p><a href="#LEARN_MORE">Learn More</a></p>
+          </figcaption>
+        </figure>
+      </div>
+      
+      <br>
+      <br>
+      <hr>
+      
+      <h2>Scale without layer promotion</h2>
+      
+      <div class="card">
+        <figure>
+          <div class="img-wrap">
+            <img src="https://placehold.it/360x150">
+          </div>
+          <figcaption class="text-wrap">
+            <h3>Crisp after scale</h3>
+            <p>Swag gentrify fashion axe Etsy, pork belly iPhone asymmetrical church-key occupy artisan. Deep v pour-over Pinterest stumptown, kale chips Marfa letterpress fixie church-key Kickstarter. Single-origin coffee Banksy locavore gluten-free lo-fi polaroid.</p>
+            <p><a href="#LEARN_MORE">Learn More</a></p>
+          </figcaption>
+        </figure>
+      </div>
+  </body>
+</html>

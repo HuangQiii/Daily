@@ -10,6 +10,7 @@
             height: 75px;
             border: 1px solid #eee;
             padding: 0;
+            perspective: 1000px;
         }
         .paper {
             width: 200px;
@@ -47,12 +48,12 @@
         }
         @keyframes flip-to-left {
             from {
-                /* transform: rotateY(0); */
-                transform: perspective(1000px) rotateY(0);
+                transform: rotateY(0);
+                /* transform: perspective(1000px) rotateY(0); */
             }
             to {
-                /* transform: rotateY(-180deg); */
-                transform: perspective(1000px) rotateY(-180deg);
+                transform: rotateY(-180deg);
+                /* transform: perspective(1000px) rotateY(-180deg); */
             }
         }
         .paper[data-right] {
@@ -83,11 +84,11 @@
             </div>
         </li>
         <li class="paper">
-            <div class="page page-3">
-                page-3
-            </div>
             <div class="page page-3-back">
                 page-3-back
+            </div>
+            <div class="page page-3">
+                page-3
             </div>
         </li>
     </ul>
