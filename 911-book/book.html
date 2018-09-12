@@ -1,0 +1,98 @@
+<html>
+  <head>
+    <style>
+        ul {
+            list-style: none;
+        }
+        .pages {
+            position: relative;
+            width: 400px;
+            height: 75px;
+            border: 1px solid #eee;
+            padding: 0;
+        }
+        .paper {
+            width: 200px;
+            height: 75px;
+            position: absolute;
+            right: 0;
+            display: none;
+            transform-style: preserve-3d;
+        }
+        .page {
+            width: 200px;
+            height: 75px;
+            box-sizing: border-box;
+            text-align: center;
+            padding-top: 20px;
+            background: lightblue;
+            border: 1px solid lightcoral;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        .paper[data-right], .paper[data-left] {
+            display: block;
+            z-index: 1;
+        }
+        .paper[data-left] {
+            right: auto;
+            left: 0;
+        }
+        .page-1, .page-2-back {
+            transform: scale(-1, 1);
+        }
+        .page-1-back, .page-2 {
+            transform: translateZ(1px);
+        }
+        @keyframes flip-to-left {
+            from {
+                /* transform: rotateY(0); */
+                transform: perspective(1000px) rotateY(0);
+            }
+            to {
+                /* transform: rotateY(-180deg); */
+                transform: perspective(1000px) rotateY(-180deg);
+            }
+        }
+        .paper[data-right] {
+            transform-origin: left center;
+            animation: flip-to-left 2s ease-in-out;
+        }
+        .paper[data-right] + .paper {
+            display: block;
+        }
+    </style>
+  </head>
+  <body>
+    <ul class="pages">
+        <li class="paper" data-left>
+            <div class="page page-1">
+                page-1
+            </div>
+            <div class="page page-1-back">
+                page-1-back
+            </div>
+        </li>
+        <li class="paper" data-right>
+            <div class="page page-2-back">
+                page-2-back
+            </div>
+            <div class="page page-2">
+                page-2
+            </div>
+        </li>
+        <li class="paper">
+            <div class="page page-3">
+                page-3
+            </div>
+            <div class="page page-3-back">
+                page-3-back
+            </div>
+        </li>
+    </ul>
+  </body>
+  <script>
+    
+  </script>
+</html>
