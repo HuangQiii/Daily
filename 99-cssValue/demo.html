@@ -1,0 +1,48 @@
+<html>
+  <head>
+    <style>
+      .out {
+        --bgColor: red;
+        --left: 0;
+      }
+
+      .d {
+        width: 100px;
+        height: 50px;
+        margin: 20px;
+        border: 1px solid gray;
+        background: var(--bgColor);
+        margin-left: var(--left);
+      }
+
+      .btn {
+        width: 50px;
+        height: 20px;
+        margin: 20px;
+        padding: 50px;
+        background: grey;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="out">
+      <div class="d"></div>
+      <div class="d"></div>
+      <div class="btn">click</div>
+    </div>
+  </body>
+  <script>
+    var i = 0;
+    var left = 0;
+    var bgColors = ['red', 'blue', 'yellow', 'green'];
+    var btn = document.querySelector('.btn');
+    var out = document.querySelector('.out');
+    document.onclick = (e) => {
+      i++;
+      left = left + 20;
+      var bgColor = bgColors[i % 4];
+      out.style.setProperty('--bgColor', bgColor);
+      out.style.setProperty('--left', `${left}px`);
+    }
+  </script>
+</html>

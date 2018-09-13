@@ -79,3 +79,23 @@
 - 从上文发现，setProperty是绑定在某个具体的结点的style上的，那么改变了这个class，别的应用了这个class的结点样式会如何？
 
 - 能否对一个结点集合，通过class可能获取多个结点，直接使用.style？
+
+### 9月13日更新
+
+对上文留下的两个问题进行了跟踪，发现可以改变父级的变量，使使用了该变量的子元素全都改变。
+
+```
+.parent {
+  --bgColor: red;
+  --left: 0;
+}
+
+.child {
+  background: var(--bgColor);
+  margin-left: var(--left);
+}
+```
+
+如上，如果改变了parent的变量，所有应用child的都会发生改变。
+
+可以查看[demo](https://github.com/HuangQiii/Daily/blob/master/99-cssValue/demo.html)
