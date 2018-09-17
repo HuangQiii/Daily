@@ -234,3 +234,50 @@ debounceSetLeft = _.debounce((left) => {
 不过这给了一个继续优化的思路，要不减少渲染卡片的数量（改变store造成重新渲染），要不改变和left相关的布局（即title的变化形式）。
 
 将使用`react-virtualized`渲染屏幕中的卡片来来减少因为改变store造成重新渲染的压力提升速度。
+
+## 9月17日更新
+
+尝试使用`react-virtualized`进行布局（会变成决定定位），由于改动较大，未进行替换。
+
+期间，使用`css value`进行过一版优化，[css value](https://github.com/HuangQiii/Daily/blob/master/99-cssValue/99-cssValue.md)
+
+在滚动后，将scrollLeft值写入故事地图的某个较外层结点，然后实现标题栏的滚动。这样，避开了将scrollLeft写入state或store来触发页面重新渲染。
+
+```
+let left = 0;
+
+...
+
+handleScroll = (e) => {
+  const { scrollLeft, scrollTop } = e.target;
+  const { UserMapStore } = this.props;
+  const { offsetTops, currentIndex } = UserMapStore;
+  const header = document.getElementById('fixHead-head');
+  document.getElementsByClassName('c7n-userMap')[0].style.setProperty('--left', `${scrollLeft}px`);
+  if (scrollLeft !== left) {
+    header.scrollLeft = scrollLeft;
+  } else {
+    const index = _.findLastIndex(offsetTops, v => v <= scrollTop + 42);
+    if (currentIndex !== index && index !== -1) {
+      UserMapStore.setCurrentIndex(index);
+    }
+  }
+  left = scrollLeft;
+};
+```
+
+这一版后，可以感觉到明显变的流畅了。
+
+## sticky
+
+虽然以前见过这个属性，也知道这是为了粘性头部而用，但是当时查兼容性比较差，又去查了一下兼容性，发现完全可以在项目中使用。
+
+![scroll_3](./screenshot/scroll_3.png)
+
+代码结构非常简单，实现垂直方向和水平方向的双布局。
+
+[点我我是例子](https://github.com/HuangQiii/Daily/blob/master/91-scroll/demo.html)
+
+最后处理了一下组件生命周期，达到了近乎原生的滚动效果，至此滚动优化结束。
+
+![scroll_4](./screenshot/scroll_4.png)
