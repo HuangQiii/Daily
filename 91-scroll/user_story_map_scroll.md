@@ -278,6 +278,14 @@ handleScroll = (e) => {
 
 [点我我是例子](https://github.com/HuangQiii/Daily/blob/master/91-scroll/demo.html)
 
+```
+const header = document.getElementById('fixHead-head');
+handleScroll = (e) => {
+  const { scrollLeft } = e.target;
+  header.scrollLeft = scrollLeft;
+};
+```
+
 最后处理了一下组件生命周期，达到了近乎原生的滚动效果，至此滚动优化结束。
 
 ![scroll_4](./screenshot/scroll_4.png)
