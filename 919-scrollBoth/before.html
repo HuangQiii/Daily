@@ -1,0 +1,61 @@
+<html>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+    .wrap {
+      width: 500px;
+    }
+    .header {
+      width: 500px;
+      overflow: scroll;
+      overflow-y: hidden;
+    }
+    .body {
+      width: 500px;
+      overflow: scroll;
+      overflow-y: hidden;
+    }
+    .content {
+      width: 1000px;
+      height: 100px;
+      background: lightblue;
+      text-align: center;
+      line-height: 100px;
+      font-size: 32px;
+    }
+  </style>
+  <body>
+      <div class="wrap">
+        <div class="header">
+          <div class="content">
+            Header
+          </div>
+        </div>
+        <div class="body">
+          <div class="content">
+            Body
+          </div>
+        </div>
+      </div>
+  </body>
+  <script>
+    document.querySelector('.header').addEventListener('scroll', handleScrollHead, { passive: true });
+    document.querySelector('.body').addEventListener('scroll', handleScroll, { passive: true });
+
+    function handleScrollHead(e) {
+      console.log('handleScroll head!');
+      var scrollLeft = e.target.scrollLeft;
+      var body = document.querySelector('.body');
+      body.scrollLeft = scrollLeft;
+    }
+
+    function handleScroll(e) {
+      console.log('handleScroll body!');
+      var scrollLeft = e.target.scrollLeft;
+      var header = document.querySelector('.header');
+      header.scrollLeft = scrollLeft;
+    }
+  </script>
+</html>
