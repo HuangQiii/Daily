@@ -12,7 +12,7 @@
 8. [9月9日 使用js改变css中的变量](https://github.com/HuangQiii/Daily/blob/master/99-cssValue/99-cssValue.md)
 9. [9月10日 关于故事地图复杂拖拽思路备忘](https://github.com/HuangQiii/Daily/blob/master/910-drag/910-drag.md)
 10. [9月11日 使用transform实现翻书效果](https://github.com/HuangQiii/Daily/blob/master/911-book/911-book.md)
-11. [9月19日 双区域同步滚动](https://github.com/HuangQiii/Daily/blob/master/911-book/919-scrollBoth.md)
+11. [9月19日 双区域同步滚动](https://github.com/HuangQiii/Daily/blob/master/919-scrollBoth/919-scrollBoth.md)
 
 ## 勘误及提问
 
