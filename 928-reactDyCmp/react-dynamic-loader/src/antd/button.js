@@ -1,0 +1,1 @@
+export default require('antd/es/button').default

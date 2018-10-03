@@ -102,6 +102,10 @@ loadRemoteComponent('https://codepen.io/tonytonyjan/pen/QEawag.js').then((Hello)
 })
 ```
 
+参考链接：
+
+[链接](https://codepen.io/qborreda/pen/JZyEaj)
+
 ## combine
 
 采用上面load from remote的思想，可以控制并写出异步加载的模式，而import是单例形式的，所以不用考虑缓存问题。
