@@ -58,6 +58,10 @@ async componentDidMount() {
 - 只动态导入需要的组件
 - 更好维护，没有复杂的选择情况
 
+具体优化：
+
+部分业务场景有多种可能，以敏捷为例子，1.加载中，2.获取到的冲刺为空，3.冲刺不为空，但该冲刺下无卡片，这些都对应不同的视图组件，动态导入的优势就很明显。
+
 ## React Loadable
 
 React Loadable是一个方便地动态导入装在一个不错的并且代码分割的库。
@@ -74,6 +78,8 @@ const MyComponent = () => (
   <LoadableOtherComponent/>
 );
 ```
+
+[官方文档](https://github.com/jamiebuilds/react-loadable)非常详细。
 
 ## load from remote
 
