@@ -13,6 +13,10 @@
 9. [9月10日 关于故事地图复杂拖拽思路备忘](https://github.com/HuangQiii/Daily/blob/master/910-drag/910-drag.md)
 10. [9月11日 使用transform实现翻书效果](https://github.com/HuangQiii/Daily/blob/master/911-book/911-book.md)
 11. [9月19日 双区域同步滚动](https://github.com/HuangQiii/Daily/blob/master/919-scrollBoth/919-scrollBoth.md)
+12. [9月22日 mvvm demo](https://github.com/HuangQiii/Daily/blob/master//922-mvvm/922-mvvm.md)
+13. [9月23日 proxy学习和immer demo](https://github.com/HuangQiii/Daily/blob/master/923-proxy/923-proxy.md)
+14. [9月25日 mini pack demo](https://github.com/HuangQiii/Daily/blob/master/925-minipack/925-minipack.md)
+15. [9月28日 load react cmp dynamic](https://github.com/HuangQiii/Daily/blob/master/928-reactDyCmp/928-reactDyCmp.md)
 
 ## 勘误及提问
 
