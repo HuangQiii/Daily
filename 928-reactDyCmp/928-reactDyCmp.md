@@ -1,3 +1,5 @@
+# dynamic react component
+
 ## dynamic import() syntax
 
 ```
@@ -12,6 +14,8 @@ import("./math").then(math => {
 是不显示的。
 
 更棒的是，当webpack遇到这种写法，会自动进行code-spliting.
+
+[参考链接](https://reactjs.org/docs/code-splitting.html#import)
 
 ## dynamically on demand
 
@@ -62,9 +66,11 @@ async componentDidMount() {
 
 部分业务场景有多种可能，以敏捷为例子，1.加载中，2.获取到的冲刺为空，3.冲刺不为空，但该冲刺下无卡片，这些都对应不同的视图组件，动态导入的优势就很明显。
 
+[参考链接](https://www.slightedgecoder.com/2017/12/03/loading-react-components-dynamically-demand/)
+
 ## React Loadable
 
-React Loadable是一个方便地动态导入装在一个不错的并且代码分割的库。
+React Loadable是一个方便地动态导入并且进行code split的库。
 
 ```
 import Loadable from 'react-loadable';
@@ -80,6 +86,8 @@ const MyComponent = () => (
 ```
 
 [官方文档](https://github.com/jamiebuilds/react-loadable)非常详细。
+
+[参考链接](https://reactjs.org/docs/code-splitting.html#react-loadable)
 
 ## load from remote
 
@@ -107,6 +115,8 @@ loadRemoteComponent('https://codepen.io/tonytonyjan/pen/QEawag.js').then((Hello)
   ReactDOM.render(<Hello/>, document.getElementById('hello'))
 })
 ```
+
+在客户端通过eval()执行代码，而代码是经过Babel编译的，其中的依赖部分都变成require了，而又重写了require函数。
 
 参考链接：
 
@@ -162,4 +172,13 @@ componentDidMount(){
 
 可以获取到moment库。
 
-且在别的页面同样使用时，不会重复加载。
+且在别的页面同样使用时，不会重复加载。（import使用的是单例）
+
+这样，可以实现设计好的组件（在服务端），需要的时候下载到本地（例子中模拟的是已经在本地并且经过Babel编译的），进行编译后，安装内部的依赖，然后运行。
+
+### 例子运行过程
+
+- 在跟目录下，`npm run babel`，讲custom下的文件编译到lib下
+- 运行`npm start`在浏览器中查看
+
+[例子](https://github.com/HuangQiii/Daily/blob/master/928-reactDyCmp/)
