@@ -1,0 +1,24 @@
+<html>
+  <body>
+    <div class="wrap">
+      <button class="add">+</button>
+      <button class="subtract">-</button>
+      <div class="number">0</div>
+    </div>
+  </body>
+  <script>
+    const wrap = document.querySelector('.wrap');
+    const addBtn = document.querySelector('.add');
+    const subtractBtn = document.querySelector('.subtract');
+    const num = document.querySelector('.number');
+    
+    addBtn.addEventListener('click', function() {
+      num.innerHTML = num.innerHTML * 1 + 1;
+    }, false);
+
+    subtractBtn.addEventListener('click', function() {
+      if (num.innerHTML < 1) return;
+      num.innerHTML = num.innerHTML * 1 - 1;
+    }, false);
+  </script>
+</html>
