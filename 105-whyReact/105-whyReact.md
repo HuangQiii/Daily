@@ -16,6 +16,8 @@ React确实给我们带来很多便利，但是如果一定要说React（甚至�
 
 #### version 1
 
+[version1 code](https://github.com/HuangQiii/Daily/blob/master/105-whyReact/Demos/version1.html)
+
 ```
 <html>
   <body>
@@ -79,6 +81,9 @@ React确实给我们带来很多便利，但是如果一定要说React（甚至�
 言多必失，要处理的东西一多也必然会难以维护，项目维护者经过长期迭代后，可能删除了页面上的html，但是留下了js部分，甚至到最后谁都不知道这部分js是做什么的，这必然不是我们所希望的。
 
 #### version2
+
+[version2 code](https://github.com/HuangQiii/Daily/blob/master/105-whyReact/Demos/version2.html)
+
 ```
 <html>
   <body>
@@ -170,6 +175,9 @@ addBtn.addEventListener('click', function() {
 先来个简单粗暴的，当数据改变时，页面全部改变，即组件重新渲染。
 
 ### version3
+
+[version3 code](https://github.com/HuangQiii/Daily/blob/master/105-whyReact/Demos/version3.html)
+
 ```
 <html>
   <body>
@@ -325,7 +333,55 @@ addBtn.addEventListener('click', function() {
 
 再做一些分离
 
+[version3 improve code](https://github.com/HuangQiii/Daily/blob/master/105-whyReact/Demos/version3-improve.html)
+
 ```
+<script>
+  class Cmp {
+    constructor() {
+    }
+
+    setState(newState) {
+      const oldEle = this.wrapper;
+      this.state = {...newState};
+      this.wrapper = this.renderElement();
+
+      if(this.update) {
+        this.update(oldEle, this.wrapper);
+      }
+    }
+
+    createWrapper(str) {
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = str;
+      return wrapper;
+    }
+
+    renderElement() {
+      this.wrapper = this.createWrapper(this.render());
+      const addBtn = this.wrapper.querySelector('.add');
+      const subtractBtn = this.wrapper.querySelector('.subtract');
+
+      addBtn.addEventListener('click', this.handleClickAdd.bind(this), false);
+
+      subtractBtn.addEventListener('click', this.handleClickSubtract.bind(this), false);
+
+      return this.wrapper;
+    }
+
+    render() {
+    }
+  }
+
+  const renderToDOM = (cmp, DOMElement) => {
+    DOMElement.appendChild(cmp.renderElement());
+    cmp.update = (old, next) => {
+      DOMElement.insertBefore(next, old);
+      DOMElement.removeChild(old);
+    }
+  }
+</script>
+
 <script>
     class Add extends Cmp {
       constructor() {
