@@ -1,0 +1,74 @@
+<html>
+  <body>
+    <div class="wrap">
+    </div>
+  </body>
+  <script>
+    class Add {
+      constructor() {
+        this.state = {
+          number: 0,
+        };
+      }
+
+      setState(newState) {
+        const oldEle = this.wrapper;
+        this.state = {...newState};
+        this.wrapper = this.renderElement();
+
+        if(this.update) {
+          this.update(oldEle, this.wrapper);
+        }
+      }
+
+      createWrapper(str) {
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = str;
+        return wrapper;
+      }
+
+      handleClickAdd() {
+        let newNumber = ++this.state.number;
+        this.setState({ number: newNumber });
+      }
+
+      handleClickSubtract() {
+        let newNumber = --this.state.number;
+        this.setState({ number: newNumber });
+      }
+
+      renderElement() {
+        this.wrapper = this.createWrapper(this.render());
+        const addBtn = this.wrapper.querySelector('.add');
+        const subtractBtn = this.wrapper.querySelector('.subtract');
+
+        addBtn.addEventListener('click', this.handleClickAdd.bind(this), false);
+
+        subtractBtn.addEventListener('click', this.handleClickSubtract.bind(this), false);
+
+        return this.wrapper;
+      }
+
+      render() {
+        const domStr = `
+          <button class="add">+</button>
+          <button class="subtract">-</button>
+          <div class="number">${this.state.number}</div>
+        `;
+
+        return domStr;
+      }
+    }
+
+    const renderToDOM = (cmp, DOMElement) => {
+      DOMElement.appendChild(cmp.renderElement());
+      cmp.update = (old, next) => {
+        DOMElement.insertBefore(next, old);
+        DOMElement.removeChild(old);
+      }
+    }
+  </script>
+  <script>
+    renderToDOM(new Add, document.querySelector('.wrap'));
+  </script>
+</html>

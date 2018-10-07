@@ -1,0 +1,47 @@
+<html>
+  <body>
+    <div class="wrap">
+    </div>
+  </body>
+  <script>
+    class Add {
+      createWrapper(str) {
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = str;
+        return wrapper;
+      }
+
+      render() {
+        const domStr = `
+          <button class="add">+</button>
+          <button class="subtract">-</button>
+          <div class="number">0</div>
+        `;
+
+        const wrapper = this.createWrapper(domStr);
+
+        const addBtn = wrapper.querySelector('.add');
+        const subtractBtn = wrapper.querySelector('.subtract');
+        const num = wrapper.querySelector('.number');
+
+        let number = 0;
+    
+        addBtn.addEventListener('click', function() {
+          num.innerHTML = ++number;
+        }, false);
+
+        subtractBtn.addEventListener('click', function() {
+          if (number < 1) return;
+          num.innerHTML = --number;
+        }, false);
+
+        return wrapper;
+      }
+    }
+  </script>
+  <script>
+    const wrap = document.querySelector('.wrap');
+    const add = new Add();
+    wrap.appendChild(add.render());
+  </script>
+</html>
