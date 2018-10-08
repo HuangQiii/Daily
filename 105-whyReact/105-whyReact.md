@@ -18,7 +18,7 @@ React确实给我们带来很多便利，但是如果一定要说React（甚至�
 
 [version1 code](https://github.com/HuangQiii/Daily/blob/master/105-whyReact/Demos/version1.html)
 
-```
+```javascript
 <html>
   <body>
     <div class="wrap">
@@ -48,7 +48,7 @@ React确实给我们带来很多便利，但是如果一定要说React（甚至�
 注意，这里获取当前值的时候用了读取页面上的值，而没有设置一个跟随变量，是因为，早期的页面，有一种从页面上（或者说从视觉上）获取页面当前状态的习惯，如点击了，加上一个类使目标变色，要提交数据时，根据是否有这个变色类去找这个类。所以这里还原了当时的这种作法。
 
 初始化版本：
-```
+```javascript
 <script>
     const wrap = document.querySelector('.wrap');
     const addBtn = document.querySelector('.add');
@@ -84,7 +84,7 @@ React确实给我们带来很多便利，但是如果一定要说React（甚至�
 
 [version2 code](https://github.com/HuangQiii/Daily/blob/master/105-whyReact/Demos/version2.html)
 
-```
+```javascript
 <html>
   <body>
     <div class="wrap">
@@ -142,7 +142,7 @@ React确实给我们带来很多便利，但是如果一定要说React（甚至�
 
 可以预见，代码里会出现类似结构：
 
-```
+```javascript
 ...
 const addBtn = wrapper.querySelector('.add');
 const subtractBtn = wrapper.querySelector('.subtract');
@@ -178,7 +178,7 @@ addBtn.addEventListener('click', function() {
 
 [version3 code](https://github.com/HuangQiii/Daily/blob/master/105-whyReact/Demos/version3.html)
 
-```
+```javascript
 <html>
   <body>
     <div class="wrap">
@@ -254,7 +254,7 @@ addBtn.addEventListener('click', function() {
 
 稍加思考就会发现，数据改变页面改变这个需求是`硬需求`，所以应该抽象出来。
 
-```
+```javascript
 <html>
   <body>
     <div class="wrap">
@@ -335,7 +335,7 @@ addBtn.addEventListener('click', function() {
 
 [version3 improve code](https://github.com/HuangQiii/Daily/blob/master/105-whyReact/Demos/version3-improve.html)
 
-```
+```javascript
 <script>
   class Cmp {
     constructor() {
