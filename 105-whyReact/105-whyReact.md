@@ -142,7 +142,7 @@ React确实给我们带来很多便利，但是如果一定要说React（甚至�
 
 可以预见，代码里会出现类似结构：
 
-```javascript
+```
 ...
 const addBtn = wrapper.querySelector('.add');
 const subtractBtn = wrapper.querySelector('.subtract');
