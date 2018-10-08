@@ -4,7 +4,7 @@
     </div>
   </body>
   <script>
-    class Add {
+    class NumInput {
       createWrapper(str) {
         const wrapper = document.createElement('div');
         wrapper.innerHTML = str;
@@ -41,7 +41,7 @@
   </script>
   <script>
     const wrap = document.querySelector('.wrap');
-    const add = new Add();
+    const add = new NumInput();
     wrap.appendChild(add.render());
   </script>
 </html>

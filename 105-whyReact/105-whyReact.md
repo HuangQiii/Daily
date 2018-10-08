@@ -91,7 +91,7 @@ React确实给我们带来很多便利，但是如果一定要说React（甚至�
     </div>
   </body>
   <script>
-    class Add {
+    class NumInput {
       createWrapper(str) {
         const wrapper = document.createElement('div');
         wrapper.innerHTML = str;
@@ -128,7 +128,7 @@ React确实给我们带来很多便利，但是如果一定要说React（甚至�
   </script>
   <script>
     const wrap = document.querySelector('.wrap');
-    const add = new Add();
+    const add = new NumInput();
     wrap.appendChild(add.render());
   </script>
 </html>
@@ -185,7 +185,7 @@ addBtn.addEventListener('click', function() {
     </div>
   </body>
   <script>
-    class Add {
+    class NumInput {
       constructor() {
         this.state = {
           number: 0,
@@ -240,7 +240,7 @@ addBtn.addEventListener('click', function() {
   </script>
   <script>
     const wrap = document.querySelector('.wrap');
-    const add = new Add();
+    const add = new NumInput();
     wrap.appendChild(add.render());
     add.update = (oldEle, newEle) => {
       wrap.insertBefore(newEle, oldEle);
@@ -261,7 +261,7 @@ addBtn.addEventListener('click', function() {
     </div>
   </body>
   <script>
-    class Add {
+    class NumInput {
       constructor() {
         this.state = {
           number: 0,
@@ -326,7 +326,7 @@ addBtn.addEventListener('click', function() {
     }
   </script>
   <script>
-    renderToDOM(new Add, document.querySelector('.wrap'));
+    renderToDOM(new NumInput, document.querySelector('.wrap'));
   </script>
 </html>
 ```
@@ -383,7 +383,7 @@ addBtn.addEventListener('click', function() {
 </script>
 
 <script>
-    class Add extends Cmp {
+    class NumInput extends Cmp {
       constructor() {
         super();
         this.state = {
@@ -412,7 +412,7 @@ addBtn.addEventListener('click', function() {
       }
     }
 
-    renderToDOM(new Add, document.querySelector('.wrap'));
+    renderToDOM(new NumInput, document.querySelector('.wrap'));
   </script>
 ```
 
