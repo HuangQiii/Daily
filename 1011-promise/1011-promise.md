@@ -105,4 +105,6 @@ function nextTick() {
 ```
 这是个顺序执行队列方法的函数。
 
+同步resolve的，是通过MutationObserver/Setimeout 0之类的方式在当前的代码单元执行完之后立刻执行成功回调；而如果是异步resolve的，是先把成功回调放到当前Promise对象的一个队列里面，等到异步结束了执行resolve的时候再用同样的方式在nextTick调用成功回调。
+
 大体如此，具体的断点过程再做补充。
