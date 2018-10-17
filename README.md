@@ -19,8 +19,8 @@
 15. [9月28日 load react cmp dynamic](https://github.com/HuangQiii/Daily/blob/master/928-reactDyCmp/928-reactDyCmp.md)
 16. [10月5日 为什么选择框架](https://github.com/HuangQiii/Daily/blob/master/105-whyReact/105-whyReact.md)
 17. [10月11日 promise原理探索](https://github.com/HuangQiii/Daily/blob/master/1011-promise/1011-promise.md)
-18. [10月11日 children原理和react-router改造](https://github.com/HuangQiii/Daily/blob/master/1016-children/1016-children.md)
-19. [10月11日 有意思的工具函数](https://github.com/HuangQiii/Daily/tree/master/1017-try)
+18. [10月16日 children原理和react-router改造](https://github.com/HuangQiii/Daily/blob/master/1016-children/1016-children.md)
+19. [10月17日 有意思的工具函数](https://github.com/HuangQiii/Daily/tree/master/1017-try)
 
 ## 勘误及提问
 
