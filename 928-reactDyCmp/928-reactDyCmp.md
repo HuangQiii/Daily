@@ -2,7 +2,7 @@
 
 ## dynamic import() syntax
 
-```
+```javascript
 import("./math").then(math => {
   console.log(math.add(16, 26));
 });
@@ -19,7 +19,7 @@ import("./math").then(math => {
 
 ## dynamically on demand
 
-```
+```javascript
 const eventElement = events.map(event => {
   switch (event) {
     case "PushEvent": return <PushEvent key={shortid.generate()} />;
@@ -36,7 +36,7 @@ return (
 );
 ```
 
-```
+```javascript
 addComponent = async type => {
   console.log(`Loading ${type} component...`);
   
@@ -72,7 +72,7 @@ async componentDidMount() {
 
 React Loadable是一个方便地动态导入并且进行code split的库。
 
-```
+```javascript
 import Loadable from 'react-loadable';
 
 const LoadableOtherComponent = Loadable({
@@ -93,7 +93,7 @@ const MyComponent = () => (
 
 有时候在运行时，需要请求远端接口直接获取组件代码，而运行环境是ES5的，所以要用Babel进行编译。‘
 
-```
+```javascript
 function loadRemoteComponent(url){
   return fetch(url)
   .then(res=>res.text())
@@ -126,7 +126,7 @@ loadRemoteComponent('https://codepen.io/tonytonyjan/pen/QEawag.js').then((Hello)
 
 采用上面load from remote的思想，可以控制并写出异步加载的模式，而import是单例形式的，所以不用考虑缓存问题。
 
-```
+```javascript
 const DynamicComponent = Loadable({
     loader: () => (fetch('/lib/client.js').then(r => r.text()).then(js => {
         var require = (name) => {
@@ -149,7 +149,7 @@ const DynamicComponent = Loadable({
 
 而对没在主页上使用的，要在主页部分通过异步加载载入，使之通过babel编译并且可以在ES5下直接使用。
 
-```
+```javascript
 const requireEnsure = (name) => {
     if(name == 'moment'){
         return import('moment')
@@ -160,7 +160,7 @@ const requireEnsure = (name) => {
 
 而在client.js下
 
-```
+```javascript
 componentDidMount(){
   window.console.log('componentDidMount')
   requireEnsure('moment').then(m => {
