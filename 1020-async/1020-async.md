@@ -79,9 +79,58 @@ console.log(2);
 // generator
 
 function* gen() {
-  var result = yield axios('url);
+  var result = yield axios('url');
+  console.log(result);
+}
+
+const gen = gen();
+const result = gen.next();
+result
+  .then(res => {
+    return res.json();
+  })
+  .then(data => {
+    gen.next(data);
+  })
+```
+
+通过不断的释放和获得控制权，执行异步操作。
+
+```javascript
+// generator
+
+try {
+  gen1 = yield axios('url1');
+  gen2 = yield axios('url2');
+  success(gen2);
+} catch (error) {
+  // handle err
 }
 ```
 
+Generator需要一个自动执行器配合使用，实现正常思维下的异步处理，有了自动执行器，异步请求可以用同步的方式写异步代码，直接将请求全部写在一起。
+
+缺点很明显了，理解难度变大了，而且需要一个自动执行器来配合使用。
 
 ### Async/Await
+
+本质上来讲，async/await可以说是generator的语法糖，内置了自动执行器。
+
+改造一下上面的例子：
+
+```javascript
+// async/await
+
+async function getRes() {
+  try {
+    res = await axios('url1');
+    res = await axios('url2');
+    return res;
+  } catch (error) {
+    // handle error
+  }
+}
+```
+
+- await只能在async函数中使用
+- await后面必须是一个Promise对象，如果不是会被转化为一个已完成状态的Promise
