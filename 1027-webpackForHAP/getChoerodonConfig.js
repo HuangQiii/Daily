@@ -9,7 +9,14 @@ const defaultConfig = {
   postcssConfig: {
     plugins: [
       autoprefixer({
-        browsers: ['last 2 versions', 'Firefox ESR', '> 1%', 'ie >= 8', 'iOS >= 8', 'Android >= 4'],
+        browsers: [
+          'last 2 versions',
+          'Firefox ESR',
+          '> 1%',
+          'ie >= 8',
+          'iOS >= 8',
+          'Android >= 4',
+        ],
       }),
     ],
   },
@@ -26,8 +33,10 @@ const defaultConfig = {
   root: '/',
   routes: null,
   local: true,
-  titlename: 'Choerodon HAP',
+  server: 'http://api.example.com',
+  titlename: 'Choerodon Hap | 汉得应用开发平台',
   favicon: 'favicon.ico',
+  proxyTarget: 'http://localhost:8080',
 };
 
 export default function getChoerodonConfig(configFile) {
