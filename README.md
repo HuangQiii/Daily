@@ -21,6 +21,8 @@
 17. [10月11日 promise原理探索](https://github.com/HuangQiii/Daily/blob/master/1011-promise/1011-promise.md)
 18. [10月16日 children原理和react-router改造](https://github.com/HuangQiii/Daily/blob/master/1016-children/1016-children.md)
 19. [10月17日 有意思的工具函数](https://github.com/HuangQiii/Daily/tree/master/1017-try)
+20. [10月20日 异步解决方案](https://github.com/HuangQiii/Daily/blob/master/1020-async/1020-async.md)
+21. [10月30日 一个关于this的问题的拓展](https://github.com/HuangQiii/Daily/blob/master/1030-this/1030-this.md)
 
 ## 勘误及提问
 
