@@ -14,4 +14,72 @@
 
 ```javascript
 
+onFilterChange(input) {
+  if (!filterSign) {
+    this.setState({ selectLoading: true });
+    // axios.post()
+    filterSign = true;
+  } else {
+    this.debounceFilterChange(input);
+  }
+}
+
+debounceFilterChange = _.debounce((input) => {
+  this.setState({ selectLoading: true });
+  // axios.post()
+}, 500);
+
 ```
+
+优点: 简单直接，lodash的debounce控制函数是否执行。
+缺点：时间间隔不好控制，理想的间隔是用户输入完毕，而我们用500ms来做间隔，只能说减少了部分无意义的请求，没有从根本上解决问题。
+
+#### solution2 compositionstart
+
+如何精确地知道用户开始输入，结束输入？
+
+查阅w3c的规范，发现还真有这样的钩子。
+
+> 开始输入法组词的时候浏览器会触发一个compositionstart事件，在输入法组词结束的时候，浏览器会触发compositionend事件。
+
+那么就简单了，（差点就去自己监听键盘事件了。。）只要维护一个变量，在compositionstart时改变，然后在onChange中判断即可。
+
+```javascript
+
+handleInputChange = (event) => {
+  const userInputValue = event.target.value
+  if (!this.isOnComposition) {
+    this.setState({ tempInput: userInputValue })
+    event.target.value = userInputValue
+    this.props.onInputChange(event)
+    this.emittedInput = true
+  } else {
+    this.setState({ tempInput: userInputValue })
+    this.emittedInput = false
+  }
+}
+
+handleComposition = (event) => {
+  if (event.type === 'compositionstart') {
+    this.isOnComposition = true
+    this.emittedInput = false
+  } else if (event.type === 'compositionend') {
+    this.isOnComposition = false
+    if (!this.emittedInput) {
+      this.handleInputChange(event)
+    }
+  }
+}
+
+...
+
+<input
+  value={this.state.tempInput}
+  onChange={this.handleInputChange}
+  onCompositionStart={this.handleComposition}
+  onCompositionEnd={this.handleComposition}
+/>
+
+```
+
+收工
