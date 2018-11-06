@@ -80,12 +80,31 @@ export default function updateWebpackConfig(mode, env) {
     throw new Error(`Should not set \`webpackConfig.entry.${entryName}\`!`);
   }
   const entryPath = join(choerodonLib, '..', 'tmp', `entry.${entryName}.js`);
+  const entryWithoutSiderPath = join(choerodonLib, '..', 'tmp', 'entry.withoutsider.js');
   customizedWebpackConfig.entry[entryName] = entryPath;
+  customizedWebpackConfig.entry.withoutsider = entryWithoutSiderPath;
   customizedWebpackConfig.plugins.push(
     new webpack.DefinePlugin(defines),
     new HtmlWebpackPlugin({
       title: process.env.TITLE_NAME || titlename,
       template: getFilePath(htmlTemplate),
+      inject: true,
+      chunks: ['vendor', entryName],
+      favicon: getFilePath(favicon),
+      minify: {
+        html5: true,
+        collapseWhitespace: true,
+        removeComments: true,
+        removeTagWhitespace: true,
+        removeEmptyAttributes: true,
+        removeStyleLinkTypeAttributes: true,
+      },
+    }),
+    new HtmlWebpackPlugin({
+      title: process.env.TITLE_NAME || titlename,
+      template: getFilePath(htmlTemplate),
+      chunks: ['vendor', 'withoutsider'],
+      filename: 'withoutsider.html',
       inject: true,
       favicon: getFilePath(favicon),
       minify: {
