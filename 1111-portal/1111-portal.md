@@ -122,3 +122,5 @@ export function getContainer(withoutWrap = false) {
 ```
 
 这样就可以达成我们的要求，渲染在非React根节点上，却是在同一颗树下的，可以获得context。
+
+这样做也可以在实现事件冒泡，但是由于这个好处不是这里使用Portal的主要解决痛点，所以不具体展开。
