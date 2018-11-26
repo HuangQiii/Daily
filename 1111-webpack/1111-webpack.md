@@ -23,9 +23,9 @@ gulp与webpack
 
 依赖解析时具体过程
 
-见下自己写一个打包器的思路
-
 压缩合并js后如何去排查错误
+
+source map,甚至可以引入source-map-loader
 
 Webpack 怎么实现不同模块规范的互转
 
