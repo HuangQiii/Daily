@@ -32,7 +32,4 @@
 
 ## 占坑
 
-- Portal
-- webpack
-- ripple
 - modal
