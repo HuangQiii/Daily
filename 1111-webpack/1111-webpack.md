@@ -140,6 +140,37 @@ new webpack.optimize.UglifyJsPlugin({
 })
 ```
 
+#### Scope Hoisting
+
+实现原理：分析出模块之间的依赖关系，尽可能的把打散的模块合并到一个函数中去，但是不能造成代码冗余。
+
+从上面的原理可以得到两个关键信息：
+
+1. 只有被引用了一次的模块才能被合并，因为如果被引用多次，不可能出现多分一样的代码
+2. 需要分析出模块之间的依赖关系，所以必须采用ES6模块化语句（同tree-shaking）
+
+优点：
+
+1. 代码体积更小，因为函数申明语句会产生大量代码
+2. 代码在运行时因为创建的函数作用域更少了，内存开销也随之变小
+
+开启：
+
+```javascript
+const ModuleConcatenationPlugin = require('webpack/lib/optimize/ModuleConcatenationPlugin');
+
+module.exports = {
+  resolve: {
+    // 针对 Npm 中的第三方模块优先采用 jsnext:main 中指向的 ES6 模块化语法的文件
+    mainFields: ['jsnext:main', 'browser', 'main']
+  },
+  plugins: [
+    // 开启 Scope Hoisting
+    new ModuleConcatenationPlugin(),
+  ],
+};
+```
+
 #### 深入系列问题
 
 - 依赖解析时具体过程
