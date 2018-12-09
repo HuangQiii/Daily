@@ -44,12 +44,46 @@ export default class PageContent extends Component {
     }
   }
 
+  /**
+   * get string of keydown, return `Shift+G` or such like this
+   * @param {*} event 
+   */
+  handleEventToGetHotkeyString(event) {
+    const hotkeyArr = [];
+    if (event.ctrlKey) {
+      hotkeyArr.push('Ctrl');
+    }
+    if (event.shiftKey) {
+      hotkeyArr.push('Shift');
+    }
+    if (event.altKey) {
+      hotkeyArr.push('Alt');
+    }
+    hotkeyArr.push(event.key.toUpperCase());
+    return hotkeyArr.join('+');
+  }
+
+  handleOnKeyDown = (event) => {
+    const hotkeyManager = getHotkeyManager();
+    const { props } = this;
+    const { hotkeys, history } = props;
+    const urlKey = history.location.pathname;
+    hotkeyManager.emit(urlKey, this.handleEventToGetHotkeyString(event));
+  }
+
   render() {
     const { props } = this;
     const { className, children, style } = props;
     const classString = classNames('page-content', className);
+    if (!props.hotkeys) {
+      return (
+        <div className={classString} style={style}>
+          {children}
+        </div>
+      );
+    }
     return (
-      <div className={classString} style={style} tabIndex="-1">
+      <div className={classString} style={style} tabIndex="-1" onKeyDown={this.handleOnKeyDown}>
         {children}
       </div>
     );

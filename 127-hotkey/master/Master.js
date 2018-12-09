@@ -16,11 +16,6 @@ export default class Index extends React.Component {
   componentDidMount() {
     this.handleLocaleContext();
     this.initHotkeyManager();
-    window.addEventListener('keydown', this.handleOnKeyDown);
-  }
-
-  componentWillUnmout() {
-    window.removeEventListener('keydown', this.handleOnKeyDown);
   }
 
   /**
@@ -40,33 +35,6 @@ export default class Index extends React.Component {
       .catch((error) => {
         hotkeyManager.init([]);
       });
-  }
-
-  /**
-   * get string of keydown, return `Shift+G` or such like this
-   * @param {*} event 
-   */
-  handleEventToGetHotkeyString(event) {
-    const hotkeyArr = [];
-    if (event.ctrlKey) {
-      hotkeyArr.push('Ctrl');
-    }
-    if (event.shiftKey) {
-      hotkeyArr.push('Shift');
-    }
-    if (event.altKey) {
-      hotkeyArr.push('Alt');
-    }
-    hotkeyArr.push(event.key.toUpperCase());
-    return hotkeyArr.join('+');
-  }
-
-  handleOnKeyDown = (event) => {
-    const hotkeyManager = getHotkeyManager();
-    const { props } = this;
-    const { hotkeys, history } = props;
-    const urlKey = history.location.pathname;
-    hotkeyManager.emit(urlKey, this.handleEventToGetHotkeyString(event));
   }
 
   handleLocaleContext() {

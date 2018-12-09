@@ -1,4 +1,5 @@
 import { DataSet } from 'choerodon-hap-ui';
+import updateHotkeys from '../../../src/containers/components/util/updateHotkeys.js';
 
 const HotkeyDataSet = new DataSet({
   name: 'Hotkey',
@@ -13,6 +14,14 @@ const HotkeyDataSet = new DataSet({
     { name: 'hotkey', type: 'string', label: '热键' },
     { name: 'description', type: 'string', label: '热键描述' },
   ],
+  events: {
+    submitSuccess: ({ dataSet, data }) => {
+      const { success, rows, total } = data;
+      if (success && total > 0) {
+        updateHotkeys(rows);
+      }
+    },
+  },
 });
 
 export default HotkeyDataSet;
