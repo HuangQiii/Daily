@@ -163,6 +163,11 @@ return (
   />
 )
 ```
+
+*12月15日补充：*
+
+遇到缓存失效的问题，查找后定位到`React.createElement`，因为componnet是通过asyncRouter包装的组件，所以每次都会diff判断为新组建，卸载后重新加载！方法就是根据key把component缓存下来。
+
 CacheComponent提供缓存功能，cacheLifecycles是cache的生命周期，剩下的就是把component渲染出来了。
 
 这样改造后，缓存的路由不会卸载，但是我们要让他表现地像消失，所以使用display:none来控制显隐。
