@@ -90,3 +90,11 @@ render() {
 因为props.children是个不同的函数，所以后来加到类中编译。
 
 ## 那么问题来了，react的渲染到底受到哪些因素影响呢？
+
+什么情况下会触发re-render，大家可能都能说上来，state和props发生改变时。
+
+再深究一点，props发生改变时是指什么的变化，props本身？或者是props中的每个属性的变化？
+
+怎么阻止re-render？阻止了以后子组件还会不会re-render？
+
+PureComponent又是应对什么场景出现的？解决了什么问题？有什么弊端？
