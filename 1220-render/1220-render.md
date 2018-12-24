@@ -138,3 +138,13 @@ state变化时，会触发渲染，这时有下面几个注意点：
 ### props改变触发
 
 这也是大部分不好定位的地方！因为state的变化，是比较明显的，如果不是state的变化，那大部分情况就是props造成的！
+
+## 如何减少无意义的渲染
+
+### shouldComponentUpdate
+
+### Updateable
+
+### PureComponent
+
+## 怎么定位
