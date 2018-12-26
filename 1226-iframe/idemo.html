@@ -1,0 +1,19 @@
+<html>
+  <head></head>
+  <body>
+    <button class="btn">click me</button>
+    i am iframe
+  </body>
+  <script>
+    const btn = document.querySelector('.btn');
+    btn.addEventListener('click', function() {
+      parent.postMessage("router:'/main'", "http://localhost:3000");
+    }, false);
+  </script>
+  <script>
+    window.addEventListener('message',function(rs){
+      var pointdata = rs.data;
+      console.log("in iframe" + pointdata);     
+    })
+  </script>
+</html>
