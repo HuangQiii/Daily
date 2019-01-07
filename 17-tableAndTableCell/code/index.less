@@ -1,0 +1,178 @@
+.borad-wrap {
+  display: flex;
+  flex: 1;
+  background: #fff;
+  position: relative;
+
+  .graph-wrap {
+    width: 450px;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    padding: 22px 24px;
+    border-right: 1px solid #d3d3d3;
+    overflow: auto;
+    // display: flex;
+    // align-items: center;
+    // justify-content: center;
+    // display: table;
+    // text-align: center;
+    // vertical-align: middle;
+
+    .tree-node {
+      margin-left: 40px;
+      position: relative;
+    }
+    
+    .tree-node::before {
+      content: "";
+      position: absolute;
+      left: -20px;
+      top: -20px;
+      width: 20px;
+      height: 47px;
+      border-left: 1px solid #5266d4;
+      border-bottom: 1px solid #5266d4;
+    }
+    
+    .tree-node.tree-node-not-last::after {
+      content: "";
+      position: absolute;
+      left: -20px;
+      top: 0;
+      bottom: 0;
+      width: 20px;
+      border-left: 1px solid #5266d4;
+    }
+    
+    .tree-node-inner {
+      position: relative;
+      width: 200px;
+      height: 54px;
+      border: 1px solid rgba(0, 0, 0, 0.36);
+      border-radius: 2px;
+      margin: 20px 0;
+      padding: 8px 14px;
+      transition: all .8s;
+    
+      .title {
+        line-height: 20px;
+        font-size: 14px;
+        color: #000;
+      }
+
+      .sub-title {
+        line-height: 18px;
+        font-size: 12px;
+        color: rgba(0, 0, 0, 0.54);
+      }
+
+      .graph-tools {
+        opacity: 0;
+        position: absolute;
+        bottom: -8px;
+        right: 10px;
+        transition: opacity .8s;
+    
+        .icon-add_circle {
+          color: #5266d4;
+        }
+    
+        .icon-remove_circle {
+          color: red;
+          margin-left: 3px;
+        }
+      }
+    
+      &:hover, &-active {
+        border-color: #5266d4;
+        transition: border-color .8s;
+      }
+    
+      &-active {
+        background-color: rgba(140, 158, 255, 0.12);
+        transition: background-color .8s;
+
+        .title {
+          color: #303f9f;
+        }
+
+        .sub-title {
+          color: #7885cb;
+        }
+      }
+    
+      &:hover .graph-tools {
+        opacity: 1;
+        cursor: pointer;
+        transition: opacity .8s;
+      }
+    
+      .inner-join {
+        position: absolute;
+        width: 9px;
+        height: 9px;
+        background: #5266d4;
+        border: 1px solid #5266d4;
+        border-radius: 10px;
+        left: -25px;
+        top: 21px;
+        z-index: 1;
+      }
+    }
+  }
+
+  .msg-wrap {
+    flex: 1;
+    margin-left: 450px;
+    padding-top: 10px;
+
+    .c7n-hap-tabs {
+      height: 100%;
+
+      .c7n-hap-tabs-flex-wrapper {
+        .c7n-hap-tabs-tab:first-child {
+          margin-left: 12px;
+        }
+      }
+
+      .c7n-hap-tabs-content {
+        height: e("calc(100% - 60px)");
+
+        .tab-wrapper {
+          height: 100%;
+        }
+      }
+    }
+  }
+}
+
+.associated-form {
+  .c7n-hap-form-vertical > tbody > tr {
+    td:nth-child(1) {
+      .c7n-hap-field-wrapper {
+        padding-right: .15rem;
+        text-align: right;
+      }
+    }
+  }
+}
+
+.logic-show {
+  .c7n-hap-form-vertical > tbody > tr {
+    td:nth-child(1) {
+      .c7n-hap-field-wrapper {
+        padding-left: 0;
+      }
+    }
+  }
+}
+
+.otherParam-form {
+  table > tbody > tr {
+    td:nth-child(1) {
+      padding-right: 10px;
+    }
+  }
+}
