@@ -1,0 +1,21 @@
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	</head>
+	<body>
+		<h1>new page</h1>
+		<button type="button" id="btn">do something</button>
+		<script>
+			document.getElementById('btn').addEventListener('click', function() {
+				var _opener = window.opener;
+				var p = _opener.document.createElement('p');
+				p.innerHTML = "haha";
+				p.style.color = "#f33";
+				_opener.document.body.appendChild(p);
+				setTimeout(function() {
+					_opener.location.href = "//www.baidu.com";
+				}, 5000)
+			});
+		</script>
+	</body>
+</html>
