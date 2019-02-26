@@ -263,5 +263,28 @@ export default shallowEqual;
 
 可以发现，比较的是两个props是否相等，当两个不为同个引用时，如果里面的第一层的每个属性都样额相等，则也算相等。
 
+### Mobx
+
+使用Mobx也能达到减少渲染的效果。
+
+如上代码：将图中的Cmp组件的@observer打开，再操作就会发现re-render变少了。
+
+原因是使用Mobx后，最小的更新单位变成了@observer。
+
+> observer 会将 React (函数)组件转换为它们需要渲染的数据的衍生。 使用 MobX 时没有所谓的智能和无脑组件。 所有的组件都会以巧妙的方式进行渲染，而只需要一种简单无脑的方式来定义它们。MobX 会确保组件总是在需要的时重新渲染，但仅此而已。
+
+![图四](./images/pic4.png)
+
+官网有个[章节](https://cn.mobx.js.org/best/react.html#%E5%A4%9A%E4%B8%AA%E7%BB%84%E4%BB%B6%E5%B0%86%E5%A6%82%E4%BD%95%E6%B8%B2%E6%9F%93)也是用于对比这个的。
+
+### 参考阅读
+
+- [传送门](https://cn.mobx.js.org/best/react-performance.html)
+
 ## 怎么定位是什么造成的re render？该渲染是否是不必要的
 
+主要使用两个辅助库
+
+- [mobx-react-devtools](https://github.com/mobxjs/mobx-react-devtools)
+
+- [why-did-you-update](https://github.com/maicki/why-did-you-update)

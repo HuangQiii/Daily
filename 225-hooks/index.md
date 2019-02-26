@@ -142,6 +142,10 @@ import Store from './store';
 
 对Provider组件来说，state和props都没有改变，不会更新。
 
+*2月26补充*
+
+在Mobx官网发现也提到了这种[现象](https://cn.mobx.js.org/best/react.html#mobx-%E5%8F%AA%E4%BC%9A%E4%B8%BA%E6%95%B0%E6%8D%AE%E6%98%AF%E7%9B%B4%E6%8E%A5%E9%80%9A%E8%BF%87-render-%E5%AD%98%E5%8F%96%E7%9A%84-observer-%E7%BB%84%E4%BB%B6%E8%BF%9B%E8%A1%8C%E6%95%B0%E6%8D%AE%E8%BF%BD%E8%B8%AA)，并且附有解决办法。
+
 ## React的渲染逻辑
 
 既然上面提到了React的渲染逻辑，就来整理一下这部分。
