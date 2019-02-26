@@ -127,24 +127,141 @@ state变化时，会触发渲染，这时有下面几个注意点：
 
 #### 总之，state变化会触发组件本身和子组件的重新渲染!
 
-## 另
+### props改变触发
+
+这也是大部分不好定位的地方！因为state的变化，是比较明显的，如果不是state的变化，那大部分情况就是props造成的！
+
+当props改变，组件发生渲染。这很好理解，尤其是从无状态组件来考虑，props直接影响了组件的渲染。
+
+### 注意点！！！
 
 我们知道state改变和props改变会触发渲染，那么这两个都没变是不是就一定不会触发渲染呢？
 
 不是的！
 
-还是上面的例子，我们从子组件的角度来看，子组件的state没变（事实上他并没有state，但是我们可以设置一个），props也没变（事实上也没有。。但是我们也可以设置一个），当我们的unused改变时，子组件也触发了重复渲染，所以看看上面的这句话，聪明的你已经有了更深刻的认识。
+![图五](./images/pic5.png)
 
-### props改变触发
+上面的例子，我们从子组件的角度来看，第一个Cmp和第三个Cmp子组件的state没变（事实上他并没有state，但是我们可以设置一个），props也没变（引用相同），当父组件重新渲染，子组件也触发了重复渲染，所以看看上面的这句话，聪明的你已经有了更深刻的认识。
 
-这也是大部分不好定位的地方！因为state的变化，是比较明显的，如果不是state的变化，那大部分情况就是props造成的！
+## 代码层面
+
+直接贴上当前React关于组件render前的shouldUpdate的判断代码：
+
+```js
+// react/packages/react-test-renderer/src/ReactShallowRender.js
+
+let shouldUpdate = true;
+if (this._forcedUpdate) {
+  shouldUpdate = true;
+  this._forcedUpdate = false;
+} else if (typeof this._instance.shouldComponentUpdate === 'function') {
+  shouldUpdate = !!this._instance.shouldComponentUpdate(
+    props,
+    state,
+    context,
+  );
+} else if (type.prototype && type.prototype.isPureReactComponent) {
+  shouldUpdate =
+    !shallowEqual(oldProps, props) || !shallowEqual(oldState, state);
+}
+
+if (shouldUpdate) {
+  // In order to support react-lifecycles-compat polyfilled components,
+  // Unsafe lifecycles should not be invoked for components using the new APIs.
+  if (
+    typeof element.type.getDerivedStateFromProps !== 'function' &&
+    typeof this._instance.getSnapshotBeforeUpdate !== 'function'
+  ) {
+    if (typeof this._instance.componentWillUpdate === 'function') {
+      this._instance.componentWillUpdate(props, state, context);
+    }
+    if (typeof this._instance.UNSAFE_componentWillUpdate === 'function') {
+      this._instance.UNSAFE_componentWillUpdate(props, state, context);
+    }
+  }
+}
+
+this._instance.context = context;
+this._instance.props = props;
+this._instance.state = state;
+this._newState = null;
+
+if (shouldUpdate) {
+  this._rendered = this._instance.render();
+}
+```
+
+可以发现，如果没有shouldComponentUpdate，不是PureComponent，该更新的全部更新（let shouldUpdate = true说明默认值为true，即更新）
+
+回过头来看看上面的场景，一目了然。
 
 ## 如何减少无意义的渲染
 
+减少无意义的re-render，其实方法从组件里已经可以看的很明显了。
+
 ### shouldComponentUpdate
 
-### Updateable
+自己写函数来返回是否渲染。
 
 ### PureComponent
 
-## 怎么定位
+根据传入的props的浅比较，如果不同则渲染。
+
+为什么是浅比较而不是深比较？因为深比较在结构层次很深的时候，比较耗费性能。从上分析也可得到，子组件的渲染是很评分的（如果每次都进行深比较，那性能必然会受到拖累）。
+
+直接贴浅比较部分源码：
+
+```js
+// react/packages/shared/shallowEqual.js
+
+import is from './objectIs';
+
+const hasOwnProperty = Object.prototype.hasOwnProperty;
+
+/**
+ * Performs equality by iterating through keys on an object and returning false
+ * when any key has values which are not strictly equal between the arguments.
+ * Returns true when the values of all keys are strictly equal.
+ */
+function shallowEqual(objA: mixed, objB: mixed): boolean {
+  if (is(objA, objB)) {
+    return true;
+  }
+
+  if (
+    typeof objA !== 'object' ||
+    objA === null ||
+    typeof objB !== 'object' ||
+    objB === null
+  ) {
+    return false;
+  }
+
+  const keysA = Object.keys(objA);
+  const keysB = Object.keys(objB);
+
+  if (keysA.length !== keysB.length) {
+    return false;
+  }
+
+  // Test for A's keys different from B.
+  for (let i = 0; i < keysA.length; i++) {
+    if (
+      !hasOwnProperty.call(objB, keysA[i]) ||
+      !is(objA[keysA[i]], objB[keysA[i]])
+    ) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+export default shallowEqual;
+
+```
+
+可以发现，比较的是两个props是否相等，当两个不为同个引用时，如果里面的第一层的每个属性都样额相等，则也算相等。
+
+## 怎么定位是什么造成的re render？该渲染是否是不必要的
+
