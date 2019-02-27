@@ -165,3 +165,194 @@ import Store from './store';
 什么情况下会触发re-render，大家可能都能说上来，state和props发生改变时。
 
 而其中的注意点和一些事例代码非常多，参加[另一篇总结](https://github.com/HuangQiii/Daily/blob/master/1220-render/1220-render.md#%E9%82%A3%E4%B9%88%E9%97%AE%E9%A2%98%E6%9D%A5%E4%BA%86react%E7%9A%84%E6%B8%B2%E6%9F%93%E5%88%B0%E5%BA%95%E5%8F%97%E5%88%B0%E5%93%AA%E4%BA%9B%E5%9B%A0%E7%B4%A0%E5%BD%B1%E5%93%8D%E5%91%A2)
+
+## Redux（待补充，可能不补充）
+
+## Mobx（待补充）
+
+### Mobx原理
+
+### Proxy
+
+### Immer模拟
+
+## HOC
+
+### 参考阅读
+
+先把最推荐阅读的链接铁扇：
+
+[React官方文中中的Higher-Order Components](https://reactjs.org/docs/higher-order-components.html)
+
+### 定义
+
+直接摘自上文
+
+> A higher-order component (HOC) is an advanced technique in React for reusing component logic. 
+
+> Concretely, a higher-order component is a function that takes a component and returns a new component.
+
+说的非常明确了，HOC是一个函数！这个函数接收一个组件并且返回一个新的组件。
+
+### 形式
+
+```js
+function enhanced(WrappedComponent) {
+  return class extends React.Component {
+    componentWillReceiveProps(nextProps) {
+      console.log('Current props: ', this.props);
+      console.log('Next props: ', nextProps);
+    }
+    render() {
+      return <WrappedComponent {...this.props} />;
+    }
+  }
+}
+```
+
+### 注意点
+
+1. 不改变原组件，而是使用组合
+
+比如要在生命周期里增加一些输出，不用去原组建的原型链上修改生命周期，而是在新返回的组件里加上新的生命周期。
+
+因为会覆盖原组件的生命周期，导致功能丢失。
+
+[链接](https://reactjs.org/docs/higher-order-components.html#dont-mutate-the-original-component-use-composition)
+
+2. 要把HOC没有用到的属性传递下去
+
+[链接](https://reactjs.org/docs/higher-order-components.html#convention-pass-unrelated-props-through-to-the-wrapped-component)
+
+3. 复制静态方法
+
+因为本来直接暴露的静态方法，被HOC包裹一层后，获取不到。
+
+[链接](https://reactjs.org/docs/higher-order-components.html#static-methods-must-be-copied-over)
+
+4. 不传递Refs
+
+可以使用React.forwardRef来解决
+
+### 总结
+
+总的来说，HOC和render props解决的问题是类似的，关注横向功能点，就是复用逻辑代码。
+
+### 各自的优缺点和取舍
+
+- (参考链接)[https://www.richardkotze.com/coding/hoc-vs-render-props-react]
+- (when-to-not-use-render-props)[https://kentcdodds.com/blog/when-to-not-use-render-props]
+
+其实用适用场景来区分比较合适
+
+HOC：
+
+- 支持ES6
+- 复用性强，支持链式调用
+- 支持传参
+- 便于组合
+- 便于调试
+
+- 要确保静态方法的复制
+- 多个HOC一起使用时，无法直接判断子组件的props是哪个HOC负责传递的
+- 多个HOC一起使用时，可能产生同名props
+- 可能会产生许多无用组件
+
+render props：
+
+- 支持ES6
+- 不会出现props重名问题
+- 不会产生无用的组件加深层级
+- 改变都在render中触发，更好地利用组件内的生命周期
+
+- 嵌套层级变多后可能难以阅读
+
+总的来说，当横向关注点很多时，HOC better to compose over render props。
+
+但是从讨论和别人的经验来看，似乎对render props更为推崇，
+
+react-router 的作者 Michael Jackson 也是 render props 的极力推崇者。他twitter过一句很有争议的话：
+
+> Next time you think you need a HOC (higher-order component) in @reactjs, you probably don't.
+
+> I can do anything you're doing with your HOC using a regular component with a render prop. Come fight me.
+
+甚至在react-route 4中唯一一个HOC——withRouter，也是用render props来实现的。[传送门](https://github.com/ReactTraining/react-router/blob/master/packages/react-router/modules/withRouter.js)
+
+## 装饰器(@)形式
+
+### 参考阅读
+
+- [Decorator](http://es6.ruanyifeng.com/?search=%E4%BF%AE%E9%A5%B0%E5%99%A8&x=0&y=0#docs/decorator)
+- [ES6 系列之我们来聊聊装饰器](https://github.com/mqyqingfeng/Blog/issues/109)
+
+装饰器其实就是普通的函数的简便写法，
+
+```js
+@decorator
+class A {}
+
+// 等同于
+
+class A {}
+A = decorator(A) || A;
+```
+
+所以只要编写好修饰器函数，并且在支持修饰器的环境下，就可以使用修饰器来表示HOC了。
+
+```js
+// demo.js
+import React from 'react';
+
+function addExtraMsg(Component) {
+  const C = props => (
+    <Component
+      {...props}
+      extraMsg="some extra msg"
+    />
+  );
+
+  C.displayName = `addExtraMsg(${Component.displayName || Component.name})`;
+  C.WrappedComponent = Component;
+
+  return C;
+}
+
+export default addExtraMsg;
+
+// use it
+@addExtraMsg
+@observer
+export default class Index extends Component {
+  ...
+  ...
+}
+```
+
+### compose函数
+
+上面讲HOC的时候，突出强调了HOC比较适合组合，这也是render props的缺点，当嵌套过多时，render props容易出现类似“回调地狱”的现象。
+
+而当使用的HOC很多时，如下
+
+```js
+withRoute(observer(inject('Store')(Index)))
+```
+
+也会变的非常晦涩难懂，而且长，这时候compose函数就发挥了他的优点，可以写成如下：
+
+```js
+const enhance = compose(withRoute, observer, inject('Store'));
+
+enhance(Index);
+```
+
+#### compose
+
+定义：
+
+> compose(f, g, h) is the same as (...args) => f(g(h(...args)))
+
+来自己实现一个compose
+
+[传送门]()
