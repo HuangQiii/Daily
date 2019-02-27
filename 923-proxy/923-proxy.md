@@ -2,9 +2,9 @@
 
 ## proxy
 
-Proxy愿意为代理，可以修改某些操作的默认行为，属于`meta programming`，可以拦截对接的访问。
+Proxy原意为代理，可以修改某些操作的默认行为，属于`meta programming`，可以拦截对象的访问。
 
-Proxy代理一个**对象**，返回一个Proxy实例。
+> Proxy代理一个**对象**，返回一个Proxy实例。
 
 最常见的形式如下：
 
@@ -31,9 +31,9 @@ var obj = new Proxy({}, {
 
 从Label编译可以看出，Proxy和`defineProperty`有部分相似。
 
-那么，Proxy到底可以做什么，带来什么遍历呢？
+那么，Proxy到底可以做什么，带来什么便利呢？
 
-### immer
+### [immer](https://github.com/mweststrate/immer)
 
 `immer`是一个解决`数据不可变`的库，和`immutable-js`类似，但是使用的是原生的方法，这相对immutable的复杂写法来说，简直是太神奇方便了，他是更接近底层的一种编写，下面尝试用Proxy写个简化版本immer。
 
