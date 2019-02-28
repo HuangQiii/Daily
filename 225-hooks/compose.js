@@ -15,3 +15,9 @@ function compose() {
 // es6
 
 const compose = (...fns) => fns.reduce((f, g) => (...args) => f(g(...args)));
+
+fns.reduce(function(f, g) {
+  return function(arg) {
+    f(g(arg));
+  }
+})
