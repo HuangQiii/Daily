@@ -32,7 +32,6 @@
 
 ## 待填
 
-- 无状态组件
 - 发布订阅
 - rxjs
 - getDrivedStateFromProp
@@ -46,3 +45,4 @@
 - React重新渲染逻辑和减少重新渲染
 - render props
 - createElement
+- 无状态组件
