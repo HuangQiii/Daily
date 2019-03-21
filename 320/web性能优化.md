@@ -17,6 +17,8 @@
 
 *由于本篇涉及的内容很多，所以参考链接放在每个章节内部*
 
+[Web 性能](https://www.zhihu.com/question/41466747/answer/584673304)
+
 ### 关键渲染路径
 
 #### 参考阅读
@@ -89,6 +91,85 @@ CRP包括几个关键的时间点：
 其实这样看下来，这些建议也就是一些所谓的”金科玉律“，但是这样反着看上去，似乎一切都变的更加详细清晰了。
 
 ### 延迟加载
+
+#### 参考阅读
+
+- [原生JS实现最简单的图片懒加载](https://segmentfault.com/a/1190000010744417?utm_source=tag-newest)
+- [IntersectionObserver API 使用教程](http://www.ruanyifeng.com/blog/2016/11/intersectionobserver_api.html)
+
+#### 延迟加载的意义
+
+其实说的宽泛一点，延迟加载本身也是上面优化CRP的一种形式，把重要的影响首屏的内容尽快加载，其他不重要的可以”延迟“一点。
+
+#### 传统延迟加载
+
+一般是根据是否出现在可视区内进行提前加载，常见于长列表图片。
+
+实现方式主要有两种：
+
+1. 监听scroll事件进行判断是不是快要到屏幕内了
+2. 使用IntersectionObserver API
+
+##### scroll事件
+
+scroll方法比较原始也比较广泛，主要做法是监听scroll事件，当到某种情况时进行事件处理，一般是处理scrollTop，offsetTop和clientHeight和height之间的关系。
+
+![pic3](./pic3.png)
+
+由一和三可得当offsetTop <= scrollTop + clientHeight时和offsetTop + height >= scrollTop时是可见的。
+
+不再赘述，一搜一大堆。
+
+另一种方法是使用getBoundingClientRect()：
+
+![pic4](./pic4.png)
+
+由于top，left等是相对于浏览器左上角的，所以可以由top和clientHeight进行对比判断是否在可视区内，top <= clientHeight就是在。
+
+```js
+function isInSight(el) {
+  const bound = el.getBoundingClientRect();
+  const clientHeight = window.innerHeight;
+  return bound.top <= clientHeight;
+}
+```
+
+####IntersectionObserver API
+
+上面两种方法都是要监听scroll事件，既然说到scroll事件就肯定要做一些防抖操作，来看另一种更适合的方法。
+
+IntersectionObserver API可以自动"观察"元素是否可见。
+
+具体的api不在此赘述，详看[此](http://www.ruanyifeng.com/blog/2016/11/intersectionobserver_api.html)
+
+以滚动图片延迟加载为例：
+
+```js
+const io = new IntersectionObserver(ioes => {
+  ioes.forEach(ioe => {
+    const { intersectionRatio } = ioe;
+    if (inteintersectionRatior <= 0) return;
+    const { target: { el }} = ioe;
+    loadImg(el);
+    el.onload = el.onerror = () => io.unobserve(el);
+  });
+});
+
+function observeImgs() {
+  const imgs = Array.from(document.querySelectorAll(".img"));
+  imgs.forEach(item => io.observe(item));
+}
+
+observeImgs();
+```
+
+#### 在React中的体现
+
+在React中，延迟加载可以说是无处不在了，而且更贴近”要用了再去加载“的概念，比如webpack打包后把chunk进行分包，再比如动态import，亦或者react-router的路由”按需加载“，体现的都是这个思想。
+
+- [dynamic react component](https://github.com/HuangQiii/Daily/blob/master/928-reactDyCmp/928-reactDyCmp.md)
+- [按需import带参模块](https://github.com/HuangQiii/Daily/blob/master/1115-dyimport/1115-dyimport.md)
+- [Code-Splitting](https://reactjs.org/docs/code-splitting.html)
 
 ### 预加载
 
