@@ -25,6 +25,17 @@
 21. [10月30日 一个关于this的问题的拓展](https://github.com/HuangQiii/Daily/blob/master/1030-this/1030-this.md)
 22. [11月11日 Portals解决弹出框获取context的问题](https://github.com/HuangQiii/Daily/blob/master/1111-portal/1111-portal.md)
 23. [11月11日 webpack常见问题集锦](https://github.com/HuangQiii/Daily/blob/master/1111-webpack/1111-webpack.md)
+24. [按需import带参模块](https://github.com/HuangQiii/Daily/blob/master/1115-dyimport/1115-dyimport.md)
+25. [焦点和tabIndex](https://github.com/HuangQiii/Daily/blob/master/1211-focus/1211-focus.md)
+26. [记录一次渲染的优化](https://github.com/HuangQiii/Daily/blob/master/1220-render/1220-render.md)
+27. [favicon替换](https://github.com/HuangQiii/Daily/tree/master/1227-favicon)
+28. [js的异常处理](https://github.com/HuangQiii/Daily/blob/master/15-trycatch/15-trycatch.md)
+29. [a标签的rel="noopener noreferrer"](https://github.com/HuangQiii/Daily/blob/master/24-a/24-a.md)
+30. [Tree常用方法](https://github.com/HuangQiii/Daily/tree/master/311-tree)
+31. [css加载阻塞渲染](https://github.com/HuangQiii/Daily/tree/master/312-%E3%80%90%E6%96%B9%E6%B3%95%E3%80%91%E5%A6%82%E4%BD%95%E5%AE%9E%E8%B7%B5css%E9%98%BB%E5%A1%9E%E6%B8%B2%E6%9F%93)
+32. [get和post的区别](https://github.com/HuangQiii/Daily/blob/master/317/get%E5%92%8Cpost%E7%9A%84%E5%8C%BA%E5%88%AB.md)
+33. [js异常处理方式](https://github.com/HuangQiii/Daily/blob/master/317/js%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E6%96%B9%E5%BC%8F.md)
+34. [web性能优化](https://github.com/HuangQiii/Daily/tree/master/320)
 
 ## 勘误及提问
 
@@ -33,7 +44,6 @@
 ## 待填
 
 - 发布订阅
-- rxjs
 - getDrivedStateFromProp
 - jest
 - rxjs常见应用场景和使用思考
