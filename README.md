@@ -36,6 +36,7 @@
 32. [get和post的区别](https://github.com/HuangQiii/Daily/blob/master/317/get%E5%92%8Cpost%E7%9A%84%E5%8C%BA%E5%88%AB.md)
 33. [js异常处理方式](https://github.com/HuangQiii/Daily/blob/master/317/js%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E6%96%B9%E5%BC%8F.md)
 34. [web性能优化](https://github.com/HuangQiii/Daily/tree/master/320)
+35. [发布订阅模式](https://github.com/HuangQiii/Daily/blob/master/%E5%8F%91%E5%B8%83%E8%AE%A2%E9%98%85%E6%A8%A1%E5%BC%8F/%E5%8F%91%E5%B8%83%E8%AE%A2%E9%98%85%E6%A8%A1%E5%BC%8F.md)
 
 ## 勘误及提问
 
@@ -43,7 +44,6 @@
 
 ## 待填
 
-- 发布订阅
 - getDrivedStateFromProp
 - jest
 - rxjs常见应用场景和使用思考
@@ -52,6 +52,7 @@
 
 ## 已填
 
+- 发布订阅
 - React重新渲染逻辑和减少重新渲染
 - render props
 - createElement
