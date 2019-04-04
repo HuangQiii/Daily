@@ -29,5 +29,36 @@
 
 再说的狭义一点，就是用webpack开发出一个能够满足日常开发和生产部署的脚手架项目。
 
-### webpack的流程
+### 从webpack的角度来看
 
+因为现代项目开发一般选用webpack作为打包工具，所以必不可缺的就是webpack的配置文件，那么就从config文件的形式来分析。
+
+#### 形式一，按环境分类的config
+
+例子就是create-react-app创建出来的项目，在config文件夹下就可以看到，有如下的文件结构：
+
+![pic1](./pic1.png)
+
+强烈建议阅读两个config，有非常完整的注释，看完基本配置webpack就ok了。
+
+仔细对比不难发现，两个文件（dev和prod）中其实有部分内容是相似甚至相同的，比如module中的部分loader的逻辑，那么另一种组织方式就出现了。
+
+#### 形式二，根据环境来从一个基础配置中做完善并返回完整配置
+
+其中choerodon-front-hap-boot就是采用这种方法。
+
+目录结构大概如下：
+
+![pic2](./pic2.png)
+
+从文件的命名上就可以看出，这种形式组织的代码，分离度更高，而且每个文件里的代码量更少，可以更专注地做自己的事情。
+
+比如getWebpackCommonConfig.js返回一份基本的配置，包括对loader的处理和部分通用的plugins的处理。
+
+updateWebpackConfig.js根据环境（development和product）对基本配置进行加工后返回。
+
+在代码里触发webpack的打包过程。
+
+### 自动化测试
+
+从create-react-app中可以看出来，采用了jest作为测试库。
