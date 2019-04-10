@@ -66,3 +66,53 @@ module.exports = {
   }
 }
 ```
+
+### eslint
+
+静态语法检查也是通过AST来实现的，这里采用回答中相关实践的一个例子来学习一下eslint插件的写法。
+
+通过[官方文档](https://eslint.org/docs/developer-guide/working-with-rules)可以发现大致写法如下：
+
+再看看如下的AST树：
+
+```js
+exports.view = {};
+module.exports = appInfo => {
+  const config = {};
+  config.keys = '123456';
+  return config;
+};
+```
+
+![pic2](./pic2.png)
+
+![pic3](./pic3.png)
+
+可以发现主要区别在left结点下，所以我们从公共结点ExpressionStatement入手，找到里面的expression，获取到left结点，根据里面的object的name是exports还是module来区分。
+
+逻辑代码如下：
+
+```js
+ExpressionStatement(node) {
+  if (node.expression.type !== 'AssignmentExpression') return;
+  const testNode = node.expression.left;
+  if (utils.isExports(testNode)) {
+    if (hasModule) {
+      context.report({ node, messageId: 'overrideExports' });
+    }
+    hasExports = true;
+  } else if (utils.isModule(testNode)) {
+    if (hasExports) {
+      context.report({ node, messageId: 'overrideExports' });
+    }
+    if (hasModule) {
+      context.report({ node, messageId: 'overrideModule' });
+    }
+    hasModule = true;
+  }
+},
+```
+
+完整结构见[链接](https://github.com/eggjs/eslint-plugin-eggache/blob/master/lib/rules/no-override-exports.js)
+
+可以发现，这是个很方便的工具，甚至可以衍生出许多类似场景，比如decorate的顺序检查问题等。
