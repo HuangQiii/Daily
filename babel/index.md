@@ -116,3 +116,74 @@ ExpressionStatement(node) {
 完整结构见[链接](https://github.com/eggjs/eslint-plugin-eggache/blob/master/lib/rules/no-override-exports.js)
 
 可以发现，这是个很方便的工具，甚至可以衍生出许多类似场景，比如decorate的顺序检查问题等。
+
+### 现学现用
+
+项目中有个需求，根据页面路由扫出所有完整路径，例如从如下代码中：
+
+```jsx
+import React, { Component } from 'react';
+import CacheRoute, { CacheSwitch } from 'react-router-cache-route';
+import asyncRouter from '../src/containers/components/util/asyncRouter';
+import { nomatch } from '../src/containers/components';
+import createRouteWrapper from '../src/containers/components/util/createRouteWrapper';
+
+const Language = asyncRouter(() => import('./language'));
+const OrgUnit = asyncRouter(() => import('./org-unit'));
+const Props = asyncRouter(() => import('./yan'));
+const HotKey = asyncRouter(() => import('./hotkey'));
+const Hk = createRouteWrapper('test/hotkey', HotKey);
+
+export default ({ match }) => (
+  <CacheSwitch>
+    <CacheRoute exact path={`${match.url}/hr/orgunit`} cacheKey={`${match.url}/hr/orgunit`} component={OrgUnit} />
+    <CacheRoute exact path={`${match.url}/prompt`} cacheKey={`${match.url}/sys/prompt`} component={Language} />
+    <CacheRoute exact path={`${match.url}/hotkey/:id`} cacheKey={`${match.url}/hotkey/:id`} component={Hk} />
+    <CacheRoute exact path={`${match.url}/hr/position`} cacheKey={`${match.url}/hr/position`} component={Props} />
+    <CacheRoute path="*" component={nomatch} />
+  </CacheSwitch>
+);
+```
+
+获取`['hr/orgunit', 'prompt', 'hotkey/:id', 'hr/positon']`
+
+于是写下如下代码完成功能：
+
+```js
+#!/usr/bin/env node
+
+const fs = require('fs');
+const path = require('path');
+const babelParse = require('@babel/parser').parse;
+const traverse = require('babel-traverse').default;
+
+const code = fs.readFileSync(path.join(process.cwd(), './route.js'), "utf8");
+
+const ast = babelParse(code, {
+  sourceType: "module",
+  allowImportExportEverywhere: true,
+  plugins: [
+    'dynamicImport',
+    "jsx",
+  ],
+});
+
+const res = [];
+
+traverse(ast, {
+  JSXAttribute(path) {
+    if (path.node.name.name === 'path') {
+      const pathValue = path.node.value.type !== 'StringLiteral' 
+        ? path.node.value.expression.quasis[1].value.raw 
+        : path.node.value.value;
+      res.push(pathValue);
+    }
+  }
+});
+
+console.log(res);
+```
+
+结果如下：
+
+![pic4](./pic4.png)
