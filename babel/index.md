@@ -187,3 +187,7 @@ console.log(res);
 结果如下：
 
 ![pic4](./pic4.png)
+
+### 强烈推荐阅读的代码和说明
+
+看到不看完放不下系列[this super tiny compiler](https://github.com/jamiebuilds/the-super-tiny-compiler/blob/master/the-super-tiny-compiler.js)
