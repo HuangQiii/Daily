@@ -191,3 +191,11 @@ console.log(res);
 ### 强烈推荐阅读的代码和说明
 
 看到不看完放不下系列[this super tiny compiler](https://github.com/jamiebuilds/the-super-tiny-compiler/blob/master/the-super-tiny-compiler.js)
+
+### 参考阅读
+
+- [前端要以正确的姿势学习编译原理（上篇）](https://zhuanlan.zhihu.com/p/36301857)
+- [前端对AST（抽象语法树）的应用越来越多，应该看什么书籍才能补充这方面的知识点？](https://www.zhihu.com/question/268622554/answer/384881779)
+- [前端工程师可以用编译原理做什么？](https://www.zhihu.com/question/274357154/answer/375520365)
+- [the-super-tiny-compiler](前端工程师可以用编译原理做什么？)
+- [对 Parser 的误解](http://www.yinwang.org/blog-cn/2015/09/19/parser)
