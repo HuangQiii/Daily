@@ -225,3 +225,71 @@ var exports = module.exports;
 所以，module.exports可以这样写module.exports = function() {}，而exports不能这样写因为会把上面这行命令给断了，相当于切断了exports与module.exports的联系。
 
 而两者混合用，也会导致exports不会起作用，因为module.exports被重新赋值了。
+
+所以，这两者是不能混用的，可以实现一个lint插件来进行检测：
+
+```js
+// util.js
+'use strict';
+
+exports.isExports = function(node) {
+  // exports.view = '';
+  // exports['view'] = '';
+  return node.object.type === 'Identifier' && node.object.name === 'exports';
+};
+
+exports.isModule = function(node) {
+  // module.exports = {};
+  // module.exports = () => {};
+  if (node.object.type === 'Identifier') {
+    return node.object.name === 'module' && node.property.type === 'Identifier' && node.property.name === 'exports';
+  }
+
+  // module.exports.test = {};
+  if (node.object.type === 'MemberExpression') {
+    const realNode = node.object;
+    return realNode.object.name === 'module' && realNode.property.type === 'Identifier' && realNode.property.name === 'exports';
+  }
+};
+```
+
+```js
+'use strict';
+
+const path = require('path');
+const utils = require('../utils');
+
+module.exports = {
+  meta: {
+    messages: {
+      overrideExports: 'Don\'t overide `exports`',
+      overrideModule: 'Don\'t overide `module.exports`',
+    },
+  },
+  create(context) {
+    let hasExports = false;
+    let hasModule = false;
+    return {
+      ExpressionStatement(node) {
+        if (!node.parent || node.parent.type !== 'Program') return;
+        if (node.expression.type !== 'AssignmentExpression') return;
+        const testNode = node.expression.left;
+        if (utils.isExports(testNode)) {
+          if (hasModule) {
+            context.report({ node, messageId: 'overrideExports' });
+          }
+          hasExports = true;
+        } else if (utils.isModule(testNode)) {
+          if (hasExports) {
+            context.report({ node, messageId: 'overrideExports' });
+          }
+          if (hasModule) {
+            context.report({ node, messageId: 'overrideModule' });
+          }
+          hasModule = true;
+        }
+      },
+    };
+  },
+};
+```
