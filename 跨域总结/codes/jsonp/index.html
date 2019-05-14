@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html>
+<body>
+	<script>
+		function jsonpCb(data) {
+			alert(data.x);
+		}
+	</script>
+	<script src="http://127.0.0.1:3000?callback=jsonpCb"></script>
+</body>
+</html>
