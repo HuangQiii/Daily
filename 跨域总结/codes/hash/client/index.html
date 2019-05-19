@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<body>
+	<script>
+		let ifr = document.createElement('iframe');
+		ifr.style.display = 'none';
+		ifr.src = "http://localhost:8081/data.html#data";
+		document.body.appendChild(ifr);
+		
+		window.addEventListener('hashchange', function(e) {
+			console.log('receive data: ', location.hash.substring(1));
+		});
+	</script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<body>
+	<script>
+		switch (location.hash) {
+			case "#data":
+				callback();
+				break;
+		}
+		function callback() {
+			const data = "data.html 's data"
+			try {
+				parent.location.hash = data;
+			} catch (e) {
+				var ifrproxy = document.createElement('iframe');
+				ifrproxy.style.display = 'none';
+				ifrproxy.src = 'http://localhost:8080/proxy.html#' + data;
+				document.body.appendChild(ifrproxy);
+			}
+		}
+	</script>
+</body>
+</html>
