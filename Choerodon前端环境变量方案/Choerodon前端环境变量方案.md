@@ -247,6 +247,38 @@ spawn.sync(shellPath, ['development'], { cwd: path.join(__dirname, '../../../'),
 
 通过指明cwd命令来改变当前文件路径。
 
+### 具体过程
+
+当为本地启动（start，development）时:
+
+- 先在用户根目录下进行查找是否有.env文件
+
+- 如果有.env文件，复制到@choerodon/boot根目录下，与env.sh同级
+
+- 运行env.sh脚本，根据shell中的逻辑，合并.default.env和.env的环境变量
+
+- 生成env-config.js到同级目录下，由于该目录被设置为contentBase，所以启动的代码中能够加载到该目录
+
+当为生产环境打包（build，product）时：
+
+- 先在用户根目录下进行查找是否有.env文件
+
+- 如果有.env文件，复制到@choerodon/boot根目录下，与env.sh同级
+
+- 运行env.sh脚本，根据shell中的逻辑，合并.default.env和.env的环境变量
+
+- 生成env-config.js到同级目录下
+
+- 复制.env,.default.env,env.shell,env-config.js到dist目录下，与index.html同级
+
+（全部复制是为了应对环境变量注入，也要考虑不注入环境变量的情况，此时env-config.js就是最终的变量）
+
+环境变量替换时
+
+- 通过docker运行shell脚本
+
+- 根据.default.env和.env的键去生成window._env_对象，此时有环境变量则替换为环境变量，无环境变量则使用原来值，生成的env-config.js在同级目录下
+
 ### Q&A
 
 #### 哪些变量适合放在这
