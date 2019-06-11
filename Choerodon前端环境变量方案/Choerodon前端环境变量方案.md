@@ -1,0 +1,268 @@
+## Choerodon前端环境变量方案
+
+### 需求
+
+有两种不同的环境变量，一是在编译时已确定的，通过config.js进行配置；而另一种是在部署时（运行时）才确定的，比较常见的是根据环境进行区分的一些变量，比如后端地址，根据你部署的环境不同而不同。当前端镜像生成后，需要通过外部去注入这个变量。
+
+### 原来的方案
+
+原来的方案将两种混合在一起，导致很难区分到底哪些是可以通过环境变量注入修改的。
+
+具体逻辑如下：
+
+代码如下：
+
+```js
+// updateWebpackConfig.js
+const { apimGateway } = choerodonConfig;
+
+...
+
+if (mode === 'start') {
+    defaultEnterPoints = {
+      APIM_GATEWAY: apimGateway,
+    };
+} else if (mode === 'build') {
+  if (isChoerodon) {
+    defaultEnterPoints = getEnterPointsConfig();
+  }
+}
+
+const mergedEnterPoints = {
+  NODE_ENV: env,
+  ...defaultEnterPoints,
+  ...enterPoints(mode, env),
+};
+const defines = Object.keys(mergedEnterPoints).reduce((obj, key) => {
+  obj[`process.env.${key}`] = JSON.stringify(process.env[key] || mergedEnterPoints[key]);
+  return obj;
+}, {});
+
+customizedWebpackConfig.plugins.push(
+    new webpack.DefinePlugin(defines),
+
+...
+
+```
+
+```js
+// getEnterPointsConfig.js
+const enterPoints = {
+  APIM_GATEWAY: 'localhost:apimgateway',
+};
+
+export default function getEnterPointsConfig() {
+  return enterPoints;
+}
+```
+
+具体步骤为：
+
+当为本地启动（start，development）时:
+
+- 先通过config.js中获取到变量值
+
+- 构造defaultEnterPoints对象，把变量放入
+
+- 然后通过DefinePlugin把这个对象的键作为变量注入
+
+为了便于管理，在@choerodon/boot/lib/containers/common/constants中有如下代码：
+
+```js
+export const TYPE = `${process.env.TYPE}`;
+export const RESOURCES_LEVEL = `${process.env.RESOURCES_LEVEL || ''}`;
+export const APIM_GATEWAY = `${process.env.APIM_GATEWAY}`;
+export const UI_CONFIGURE = `${process.env.UI_CONFIGURE}`;
+export const EMAIL_BLOCK_LIST = `${process.env.EMAIL_BLOCK_LIST}`;
+```
+
+在代码中就可以使用了。
+
+当为生产环境（build， product）时:
+
+- 直接使用默认的环境变量及其占位值（这些值是后来替换环境变量的依据）
+
+- 通过structure/enterpoint.sh去执行全局替换
+
+```sh
+#!/bin/bash
+set -e
+
+find /usr/share/nginx/html -name '*.js' | xargs sed -i "s localhost:http $PRO_HTTP g"
+find /usr/share/nginx/html -name '*.js' | xargs sed -i "s localhost:8080 $PRO_API_HOST g"
+find /usr/share/nginx/html -name '*.js' | xargs sed -i "s localhost:clientId $PRO_CLIENT_ID g"
+find /usr/share/nginx/html -name '*.js' | xargs sed -i "s localhost:local $PRO_LOCAL g"
+find /usr/share/nginx/html -name '*.js' | xargs sed -i "s localhost:headertitlename $PRO_HEADER_TITLE_NAME g"
+find /usr/share/nginx/html -name '*.js' | xargs sed -i "s localhost:cookieServer $PRO_COOKIE_SERVER g"
+find /usr/share/nginx/html -name '*.html' | xargs sed -i "s localhost:titlename $PRO_TITLE_NAME g"
+find /usr/share/nginx/html -name '*.js' | xargs sed -i "s localhost:fileserver $PRO_FILE_SERVER g"
+find /usr/share/nginx/html -name '*.js' | xargs sed -i "s localhost:wsserver $PRO_WEBSOCKET_SERVER g"
+find /usr/share/nginx/html -name '*.js' | xargs sed -i "s localhost:apimgateway $PRO_APIM_GATEWAY g"
+
+exec "$@"
+```
+
+可见，当为product环境时，只有环境变量才起效（本地设置的值是无效的）。
+
+### 缺点
+
+通过上一章节的分析，可以明确的发现，一个是增加环境变量的复杂性，当增加一个环境变量，要修改至少三处地方（enterpoint.sh, contants.js, updateWebpackConfig.js）。如果使用@choerodon/boot的其他项目要加入一个环境变量（这个变量可能只有他自己使用），即使boot没有做任何修改，也必须增加了变量发布一个新版本。
+
+而且从上文可以看出，确定哪些变量是config.js中配置和环境变量注入是很不明确的（或者说是随@choerodon/boot开发者确定的），而且部署生产环境时，有些变量是必须有环境变量的（一般的逻辑是环境变量覆盖用户变量再覆盖默认值）。
+
+### 新方案
+
+还是使用shell脚本的方式，但这次直接生成js文件，通过window._env_ = {}来注入一个全局的变量，使用时只要通过window._env_yourVarName来获取即可。
+
+具体分为如下几个文件：
+
+- .default.env: 该文件一般是一些初始环境变量的默认值，目前包括一些原有的环境变量，达到平滑升级的效果。
+
+- .env: 用户使用的环境变量文件，用户可以在该文件中以键=值的形式声明环境变量
+
+- env-config.js: 通过运行shell脚本后生成的最终环境变量对象，结构如下：
+
+- env.sh: sh脚本，进行用户环境变量和注入环境变量的合并
+
+```sh
+#!/bin/bash
+
+mode=$1
+
+# Recreate config file
+rm -rf ./env-config.js
+touch ./env-config.js
+
+# Add assignment 
+echo "window._env_ = {" >> ./env-config.js
+
+# Read each line in .env file
+# Each line represents key=value pairs
+while read -r line || [[ -n "$line" ]];
+do
+  # Split env variables by character `=`
+  if printf '%s\n' "$line" | grep -q -e '='; then
+    varname=$(printf '%s\n' "$line" | sed -e 's/=.*//')
+    varvalue=$(printf '%s\n' "$line" | sed -e 's/^[^=]*=//')
+  fi
+
+  # Read value of current variable if exists as Environment variable
+  value=$(printf '%s\n' "${!varname}")
+  # Otherwise use value from .env file
+  [[ -z $value ]] && value=${varvalue}
+  
+  # Append configuration property to JS file
+  echo "  $varname: \"$value\"," >> ./env-config.js
+done < .env
+
+while read -r line || [[ -n "$line" ]];
+do
+  # Split env variables by character `=`
+  if printf '%s\n' "$line" | grep -q -e '='; then
+    varname=$(printf '%s\n' "$line" | sed -e 's/=.*//')
+    varvalue=$(printf '%s\n' "$line" | sed -e 's/^[^=]*=//')
+  fi
+
+  # Read value of current variable if exists as Environment variable
+  value=$(printf '%s\n' "${!varname}")
+  # Otherwise use value from .env file
+  [[ -z $value ]] && value=${varvalue}
+  
+  # Append configuration property to JS file
+  echo "  $varname: \"$value\"," >> ./env-config.js
+done < .default.env
+
+echo "}" >> ./env-config.js
+
+echo "// ${mode}" >> ./env-config.js
+```
+
+步骤解析：
+
+- 创建env-config.js文件
+
+- 写入第一行window._env_={
+
+- 遍历.default.env，如果存在环境变量，则写入键：环境变量值，不存在则写入键：值
+
+- 遍历.env，处理逻辑同上（这里使用了js对象重复声明一个值，后面的会覆盖前面的特性）
+
+- 在文件最后写上}表示结束
+
+### 需要解决的问题
+
+#### 开发环境时，通过webpack-dev-server生成的html文件在内存中，那env-config.js写到哪？
+
+通过配置contentBase来加载
+
+```js
+// start.js
+const serverOptions = {
+  quiet: true,
+  hot: true,
+  ...devServerConfig,
+  // contentBase: path.join(process.cwd(), output),
+  contentBase: [path.join(process.cwd(), 'src', 'main', 'resources', 'lib', output), path.join(__dirname, '../../')],
+  historyApiFallback: true,
+  host: 'localhost',
+};
+WebpackDevServer.addDevServerEntrypoints(webpackConfig, serverOptions);
+```
+
+#### 怎么通过npm调用shell
+
+```js
+// generateEnv.js
+
+import spawn from 'cross-spawn';
+
+const fs = require('fs');
+const path = require('path');
+
+function generateEnv(callback) {
+  const customEnvPath = path.join(process.cwd(), '.env');
+  const dirEnvPath = path.join(__dirname, '../../..', '.env');
+  if (fs.existsSync(customEnvPath)) {
+    fs.copyFileSync(customEnvPath, dirEnvPath);
+  } else {
+    fs.writeFile(dirEnvPath, '', 'utf8', null);
+  }
+
+  const shellPath = path.join(__dirname, '../../../', 'env.sh');
+  spawn.sync(shellPath, ['development'], { cwd: path.join(__dirname, '../../../'), stdio: 'inherit' });
+  callback();
+}
+
+module.exports = generateEnv;
+
+```
+
+可以发现，上面的代码中还有复制的操作，这是为了在其他项目使用时，把用户的.env文件复制到shell脚本同级目录，运行时修改当前文件目录，来达到多种开发模式统一的效果。
+
+#### shell的当前目录相对于命令运行时的目录而不是文件目录
+
+```js
+spawn.sync(shellPath, ['development'], { cwd: path.join(__dirname, '../../../'), stdio: 'inherit' });
+```
+
+通过指明cwd命令来改变当前文件路径。
+
+### Q&A
+
+#### 哪些变量适合放在这
+
+当采用新的模式后，所有的决定权都在于开发人员（需要慎重），你可以自己声明一个变量，然后在代码中使用，这时当部署生产环境时，你可以在.env中声明一个值，然后通过环境变量去覆盖他，也可以只是声明这个值（类似于原来的config.js中配置）。
+
+但是总的来说，我们建议你仔细考虑哪些变量是应该作为环境变量注入的，比较方便的判断方式是，当一个前端镜像部署到不同环境时，你的变量值是否应该改变，如果是，他可能应该作为一个环境变量。
+
+#### 加入了环境变量后不起效
+
+加入了环境变量后，可以在node_modules/@choerodon/boot/env-config.js中查看，自己的环境变量到底有没有被注入，如果被别的库覆盖，可以考虑起个独特的名字或者和他人进行商议（后期会考虑当环境变量重复时，进行警告等检测）。
+
+#### 原来的环境变量方案会被剔除吗
+
+暂时不会剔除原先的环境变量方案，即还是可以通过costants.js中获取部分环境变量值，但是不排除在今后剔除这种模式。
+
+#### 当环境变量不是字符类型时怎么处理
+
+一般环境变量都是以字符形式注入的，非字符形式可以通过config.js进行处理（如钩子函数等），或者通过序列化来进行处理(JSON.stringfiy).
