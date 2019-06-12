@@ -298,3 +298,7 @@ spawn.sync(shellPath, ['development'], { cwd: path.join(__dirname, '../../../'),
 #### 当环境变量不是字符类型时怎么处理
 
 一般环境变量都是以字符形式注入的，非字符形式可以通过config.js进行处理（如钩子函数等），或者通过序列化来进行处理(JSON.stringfiy).
+
+#### 更新后没有生成env-config.js文件怎么回事
+
+使用带shell环境的终端启动，VSCode可以在终端右上角选择带Shell的终端
