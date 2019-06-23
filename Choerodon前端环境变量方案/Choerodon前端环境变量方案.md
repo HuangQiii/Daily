@@ -1,12 +1,27 @@
 ## Choerodon前端环境变量方案
 
+配置React应用程序的方法有很多，在本文中，将向您展示Choerodon的新环境变量替换放缓，该方法可以在运行时进行重新配置，所以不需要针对每个环境进行构建。
+
 ### 需求
 
-有两种不同的环境变量，一是在编译时已确定的，通过config.js进行配置；而另一种是在部署时（运行时）才确定的，比较常见的是根据环境进行区分的一些变量，比如后端地址，根据你部署的环境不同而不同。当前端镜像生成后，需要通过外部去注入这个变量。
+我们希望能够将React应用程序使用Docker运行，该容器只构建一次，并在任何地方运行，并且希望在运行时重新配置容器，而且应该允许在docker-compose文件内进行变量配置。
+
+```
+version: "3.2"
+services:
+  my-react-app:
+    image: my-react-app
+    ports:
+      - "3000:80"
+    environment:
+      - "API_URL=production.example.com"
+```
+*注：*
+在开发中，有两种不同的环境变量。一是在编译时已确定的，通过类似config.js的配置文件进行配置；而另一种是在部署时（运行时）才确定的，比较常见的是根据环境进行区分的一些变量，比如后端地址，根据部署的环境不同而不同。当前端镜像生成后，需要通过外部去注入这个变量。
 
 ### 原来的方案
 
-原来的方案将两种混合在一起，导致很难区分到底哪些是可以通过环境变量注入修改的。
+原来的方案将两种变量混合在一起，导致很难区分到底哪些是可以通过环境变量注入修改的。
 
 具体逻辑如下：
 
@@ -64,7 +79,7 @@ export default function getEnterPointsConfig() {
 
 - 构造defaultEnterPoints对象，把变量放入
 
-- 然后通过DefinePlugin把这个对象的键作为变量注入
+- 然后通过DefinePlugin插件把这个对象的键作为变量注入
 
 为了便于管理，在@choerodon/boot/lib/containers/common/constants中有如下代码：
 
@@ -106,9 +121,9 @@ exec "$@"
 
 ### 缺点
 
-通过上一章节的分析，可以明确的发现，一个是增加环境变量的复杂性，当增加一个环境变量，要修改至少三处地方（enterpoint.sh, contants.js, updateWebpackConfig.js）。如果使用@choerodon/boot的其他项目要加入一个环境变量（这个变量可能只有他自己使用），即使boot没有做任何修改，也必须增加了变量发布一个新版本。
+通过上一章节的分析，可以明确地发现，增加环境变量是很复杂的。当增加一个环境变量，要修改至少三处地方（enterpoint.sh, contants.js, updateWebpackConfig.js）。如果使用@choerodon/boot的其他项目要加入一个环境变量（这个变量可能只有他自己使用），即使boot（启动器项目，脚手架）没有做任何修改，也必须增加了变量发布一个新版本。
 
-而且从上文可以看出，确定哪些变量是config.js中配置和环境变量注入是很不明确的（或者说是随@choerodon/boot开发者确定的），而且部署生产环境时，有些变量是必须有环境变量的（一般的逻辑是环境变量覆盖用户变量再覆盖默认值）。
+而且从上文可以看出，界定哪些变量是config.js中配置，哪些是环境变量注入是很不明确的（或者说是随@choerodon/boot开发者确定的），而且部署生产环境时，有些变量是必须有环境变量的（一般的逻辑是环境变量覆盖用户变量再覆盖默认值）。
 
 ### 新方案
 
@@ -189,6 +204,10 @@ echo "// ${mode}" >> ./env-config.js
 
 - 在文件最后写上}表示结束
 
+### 优化
+
+由于考虑到window平台的开发者，在node内部调用shell脚本可能不会运行，所以用node模拟了一套上述方案，在本地开发和打包时，使用node进行环境变量的合并，当使用环境变量注入时，调用shell脚本进行合并。
+
 ### 需要解决的问题
 
 #### 开发环境时，通过webpack-dev-server生成的html文件在内存中，那env-config.js写到哪？
@@ -202,7 +221,7 @@ const serverOptions = {
   hot: true,
   ...devServerConfig,
   // contentBase: path.join(process.cwd(), output),
-  contentBase: [path.join(process.cwd(), 'src', 'main', 'resources', 'lib', output), path.join(__dirname, '../../')],
+  contentBase: [path.join(__dirname, '../../'), ...],
   historyApiFallback: true,
   host: 'localhost',
 };
@@ -255,7 +274,7 @@ spawn.sync(shellPath, ['development'], { cwd: path.join(__dirname, '../../../'),
 
 - 如果有.env文件，复制到@choerodon/boot根目录下，与env.sh同级
 
-- 运行env.sh脚本，根据shell中的逻辑，合并.default.env和.env的环境变量
+- 根据shell中的逻辑，合并.default.env和.env的环境变量
 
 - 生成env-config.js到同级目录下，由于该目录被设置为contentBase，所以启动的代码中能够加载到该目录
 
@@ -265,7 +284,7 @@ spawn.sync(shellPath, ['development'], { cwd: path.join(__dirname, '../../../'),
 
 - 如果有.env文件，复制到@choerodon/boot根目录下，与env.sh同级
 
-- 运行env.sh脚本，根据shell中的逻辑，合并.default.env和.env的环境变量
+- 根据shell中的逻辑，合并.default.env和.env的环境变量
 
 - 生成env-config.js到同级目录下
 
@@ -285,7 +304,12 @@ spawn.sync(shellPath, ['development'], { cwd: path.join(__dirname, '../../../'),
 
 当采用新的模式后，所有的决定权都在于开发人员（需要慎重），你可以自己声明一个变量，然后在代码中使用，这时当部署生产环境时，你可以在.env中声明一个值，然后通过环境变量去覆盖他，也可以只是声明这个值（类似于原来的config.js中配置）。
 
-但是总的来说，我们建议你仔细考虑哪些变量是应该作为环境变量注入的，比较方便的判断方式是，当一个前端镜像部署到不同环境时，你的变量值是否应该改变，如果是，他可能应该作为一个环境变量。
+但是总的来说，我们建议你仔细考虑哪些变量是应该作为环境变量注入的。
+
+有两种比较方便的判断方式：
+
+- 当一个前端镜像部署到不同环境时，你的变量值是否应该改变，如果是，他可能应该作为一个`环境变量`
+- 你的变量是运用在代码打包时的，那么他可能是个`非环境变量`
 
 #### 加入了环境变量后不起效
 
@@ -298,3 +322,5 @@ spawn.sync(shellPath, ['development'], { cwd: path.join(__dirname, '../../../'),
 #### 当环境变量不是字符类型时怎么处理
 
 一般环境变量都是以字符形式注入的，非字符形式可以通过config.js进行处理（如钩子函数等），或者通过序列化来进行处理(JSON.stringfiy).
+
+如上所述，构建时配置将满足大多数场景，既可以自定义增加变量，用自定义的值作为最终指，也可以用环境变量覆盖。
