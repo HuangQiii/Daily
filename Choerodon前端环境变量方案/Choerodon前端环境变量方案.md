@@ -4,7 +4,7 @@
 
 ### 需求
 
-我们希望能够将React应用程序使用Docker运行，该容器只构建一次，并在任何地方运行，并且希望在运行时重新配置容器，而且应该允许在docker-compose文件内进行变量配置。
+希望能够将React应用程序使用Docker运行，该容器只构建一次，并在任何地方运行，并且希望在运行时重新配置容器，而且应该允许在docker-compose文件内进行变量配置。
 
 ```
 version: "3.2"
@@ -107,8 +107,6 @@ find /usr/share/nginx/html -name '*.js' | xargs sed -i "s localhost:http $PRO_HT
 find /usr/share/nginx/html -name '*.js' | xargs sed -i "s localhost:8080 $PRO_API_HOST g"
 find /usr/share/nginx/html -name '*.js' | xargs sed -i "s localhost:clientId $PRO_CLIENT_ID g"
 find /usr/share/nginx/html -name '*.js' | xargs sed -i "s localhost:local $PRO_LOCAL g"
-find /usr/share/nginx/html -name '*.js' | xargs sed -i "s localhost:headertitlename $PRO_HEADER_TITLE_NAME g"
-find /usr/share/nginx/html -name '*.js' | xargs sed -i "s localhost:cookieServer $PRO_COOKIE_SERVER g"
 find /usr/share/nginx/html -name '*.html' | xargs sed -i "s localhost:titlename $PRO_TITLE_NAME g"
 find /usr/share/nginx/html -name '*.js' | xargs sed -i "s localhost:fileserver $PRO_FILE_SERVER g"
 find /usr/share/nginx/html -name '*.js' | xargs sed -i "s localhost:wsserver $PRO_WEBSOCKET_SERVER g"
@@ -121,7 +119,7 @@ exec "$@"
 
 ### 缺点
 
-通过上一章节的分析，可以明确地发现，增加环境变量是很复杂的。当增加一个环境变量，要修改至少三处地方（enterpoint.sh, contants.js, updateWebpackConfig.js）。如果使用@choerodon/boot的其他项目要加入一个环境变量（这个变量可能只有他自己使用），即使boot（启动器项目，脚手架）没有做任何修改，也必须增加了变量发布一个新版本。
+通过上一章节的分析，可以明确地发现，增加环境变量是很复杂的。当增加一个环境变量，要修改至少三处地方（enterpoint.sh, contants.js, updateWebpackConfig.js）。如果使用@choerodon/boot的其他项目要加入一个环境变量（这个变量可能只有该项目使用），即使boot（启动器项目，脚手架）没有做任何修改，也必须增加了变量发布一个新版本。
 
 而且从上文可以看出，界定哪些变量是config.js中配置，哪些是环境变量注入是很不明确的（或者说是随@choerodon/boot开发者确定的），而且部署生产环境时，有些变量是必须有环境变量的（一般的逻辑是环境变量覆盖用户变量再覆盖默认值）。
 
@@ -207,6 +205,17 @@ echo "// ${mode}" >> ./env-config.js
 ### 优化
 
 由于考虑到window平台的开发者，在node内部调用shell脚本可能不会运行，所以用node模拟了一套上述方案，在本地开发和打包时，使用node进行环境变量的合并，当使用环境变量注入时，调用shell脚本进行合并。
+
+### 使用
+
+1. 将@choerodon/boot版本进行升级
+2. 在项目根目录下（和package.json同级）创建.env文件（如果没有自定义变量可以不创建）
+3. 以键=值的形式写入变量，如
+
+```
+SERVER=http://choerodon.com.cn
+AUTH_URL=https://api.choerodon.com.cn/oauth/login
+```
 
 ### 需要解决的问题
 
@@ -302,14 +311,14 @@ spawn.sync(shellPath, ['development'], { cwd: path.join(__dirname, '../../../'),
 
 #### 哪些变量适合放在这
 
-当采用新的模式后，所有的决定权都在于开发人员（需要慎重），你可以自己声明一个变量，然后在代码中使用，这时当部署生产环境时，你可以在.env中声明一个值，然后通过环境变量去覆盖他，也可以只是声明这个值（类似于原来的config.js中配置）。
+当采用新的模式后，所有的决定权都在于开发人员（需要慎重），开发人员可以自己声明一个变量，然后在代码中使用，这时当部署生产环境时，可以在.env中声明一个值，然后通过环境变量去覆盖，也可以只是声明这个值（类似于原来的config.js中配置）。
 
-但是总的来说，我们建议你仔细考虑哪些变量是应该作为环境变量注入的。
+但是总的来说，建议仔细考虑哪些变量是应该作为环境变量注入的。
 
 有两种比较方便的判断方式：
 
-- 当一个前端镜像部署到不同环境时，你的变量值是否应该改变，如果是，他可能应该作为一个`环境变量`
-- 你的变量是运用在代码打包时的，那么他可能是个`非环境变量`
+- 当一个前端镜像部署到不同环境时，该变量值是否应该改变，如果是，可能应该作为一个`环境变量`
+- 变量是运用在代码打包时的，那么该变量可能是个`非环境变量`
 
 #### 加入了环境变量后不起效
 
