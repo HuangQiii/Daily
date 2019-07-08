@@ -1,10 +1,14 @@
 ## Choerodon前端环境变量方案
 
-配置React应用程序的方法有很多，在本文中，将向您展示Choerodon的新环境变量替换放缓，该方法可以在运行时进行重新配置，所以不需要针对每个环境进行构建。
+配置React应用程序的方法有很多，在本文中，将向您展示Choerodon平台前端的新环境变量方案，该方案可以实现在运行时配置，所以不需要针对每个环境都进行构建。
+
+![react](./img/react.png)
 
 ### 需求
 
-希望能够将React应用程序使用Docker运行，该容器只构建一次，并在任何地方运行，并且希望在运行时重新配置容器，而且应该允许在docker-compose文件内进行变量配置。
+希望能够将React应用程序使用Docker运行，只构建一次，能够在任何地方运行，并且希望在运行时提供重新配置容器的时机，允许在docker-compose文件内进行变量配置。
+
+例如：
 
 ```
 version: "3.2"
@@ -16,14 +20,13 @@ services:
     environment:
       - "API_URL=production.example.com"
 ```
+
 *注：*
-在开发中，有两种不同的环境变量。一是在编译时已确定的，通过类似config.js的配置文件进行配置；而另一种是在部署时（运行时）才确定的，比较常见的是根据环境进行区分的一些变量，比如后端地址，根据部署的环境不同而不同。当前端镜像生成后，需要通过外部去注入这个变量。
+在开发中，有两种不同的环境变量。一是在`编译`时已确定的，通过类似config.js的配置文件进行配置；而另一种是在`部署`时（`运行时`）才确定的，比较常见的是根据环境进行区分的一些变量，比如API请求地址前缀，根据部署的环境不同而不同。当前端镜像生成后，需要通过外部去注入这个变量。
 
 ### 原来的方案
 
 原来的方案将两种变量混合在一起，导致很难区分到底哪些是可以通过环境变量注入修改的。
-
-具体逻辑如下：
 
 代码如下：
 
@@ -103,25 +106,29 @@ export const EMAIL_BLOCK_LIST = `${process.env.EMAIL_BLOCK_LIST}`;
 #!/bin/bash
 set -e
 
-find /usr/share/nginx/html -name '*.js' | xargs sed -i "s localhost:http $PRO_HTTP g"
 find /usr/share/nginx/html -name '*.js' | xargs sed -i "s localhost:8080 $PRO_API_HOST g"
-find /usr/share/nginx/html -name '*.js' | xargs sed -i "s localhost:clientId $PRO_CLIENT_ID g"
-find /usr/share/nginx/html -name '*.js' | xargs sed -i "s localhost:local $PRO_LOCAL g"
 find /usr/share/nginx/html -name '*.html' | xargs sed -i "s localhost:titlename $PRO_TITLE_NAME g"
-find /usr/share/nginx/html -name '*.js' | xargs sed -i "s localhost:fileserver $PRO_FILE_SERVER g"
-find /usr/share/nginx/html -name '*.js' | xargs sed -i "s localhost:wsserver $PRO_WEBSOCKET_SERVER g"
-find /usr/share/nginx/html -name '*.js' | xargs sed -i "s localhost:apimgateway $PRO_APIM_GATEWAY g"
 
 exec "$@"
 ```
 
+使用脚本去进行全局搜索，然后进行字符替换。
+
 可见，当为product环境时，只有环境变量才起效（本地设置的值是无效的）。
+
+![pic1](./img/pic1.png)
 
 ### 缺点
 
-通过上一章节的分析，可以明确地发现，增加环境变量是很复杂的。当增加一个环境变量，要修改至少三处地方（enterpoint.sh, contants.js, updateWebpackConfig.js）。如果使用@choerodon/boot的其他项目要加入一个环境变量（这个变量可能只有该项目使用），即使boot（启动器项目，脚手架）没有做任何修改，也必须增加了变量发布一个新版本。
+通过上一章节和示意图的分析，可以发现如下缺点：
 
-而且从上文可以看出，界定哪些变量是config.js中配置，哪些是环境变量注入是很不明确的（或者说是随@choerodon/boot开发者确定的），而且部署生产环境时，有些变量是必须有环境变量的（一般的逻辑是环境变量覆盖用户变量再覆盖默认值）。
+1. 增加环境变量是很复杂的：当增加一个环境变量，要修改至少三处地方（enterpoint.sh, contants.js, updateWebpackConfig.js）。如果使用@choerodon/boot的其他项目要加入一个环境变量（这个变量可能只有该项目使用），即使boot（启动器项目，脚手架）没有做任何修改，也必须增加了变量发布一个新版本。
+
+2. 而且从上文可以看出，界定哪些变量是config.js中配置，哪些是环境变量注入是很不明确的（或者说是随@choerodon/boot开发者确定的）
+
+3. 无法明确知道变量是否还在使用。
+
+4. 部署生产环境时，有些变量是必须有环境变量的（一般的逻辑是环境变量覆盖用户变量再覆盖默认值）。
 
 ### 新方案
 
@@ -237,36 +244,6 @@ const serverOptions = {
 WebpackDevServer.addDevServerEntrypoints(webpackConfig, serverOptions);
 ```
 
-#### 怎么通过npm调用shell
-
-```js
-// generateEnv.js
-
-import spawn from 'cross-spawn';
-
-const fs = require('fs');
-const path = require('path');
-
-function generateEnv(callback) {
-  const customEnvPath = path.join(process.cwd(), '.env');
-  const dirEnvPath = path.join(__dirname, '../../..', '.env');
-  if (fs.existsSync(customEnvPath)) {
-    fs.copyFileSync(customEnvPath, dirEnvPath);
-  } else {
-    fs.writeFile(dirEnvPath, '', 'utf8', null);
-  }
-
-  const shellPath = path.join(__dirname, '../../../', 'env.sh');
-  spawn.sync(shellPath, ['development'], { cwd: path.join(__dirname, '../../../'), stdio: 'inherit' });
-  callback();
-}
-
-module.exports = generateEnv;
-
-```
-
-可以发现，上面的代码中还有复制的操作，这是为了在其他项目使用时，把用户的.env文件复制到shell脚本同级目录，运行时修改当前文件目录，来达到多种开发模式统一的效果。
-
 #### shell的当前目录相对于命令运行时的目录而不是文件目录
 
 ```js
@@ -323,6 +300,10 @@ spawn.sync(shellPath, ['development'], { cwd: path.join(__dirname, '../../../'),
 #### 加入了环境变量后不起效
 
 加入了环境变量后，可以在node_modules/@choerodon/boot/env-config.js中查看，自己的环境变量到底有没有被注入，如果被别的库覆盖，可以考虑起个独特的名字或者和他人进行商议（后期会考虑当环境变量重复时，进行警告等检测）。
+
+当部署后，可以通过浏览器直接打开env-config.js文件来查看变量的情况。
+
+![pic2](./img/pic2.png)
 
 #### 原来的环境变量方案会被剔除吗
 
