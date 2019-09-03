@@ -188,6 +188,72 @@ console.log(res);
 
 ![pic4](./pic4.png)
 
+### 2019/9/3补充
+
+由于项目结构的设计和拆分，现在需要从boot项目中传递暴露master项目中暴露的组件，这样，模块项目引入组件后，即使更换master项目也不需要进行代码更改。
+
+本着代码就是字符串的原则，进行了一版本字符串的正则替换和处理地开发，但是稍微一设想，在今后考虑到编译等各种场景后，就会变得不那么容易截取和替换，还是上AST替换，代码比较简单直接上code：
+
+```js
+import fs from 'fs';
+import path from 'path';
+import nunjucks from 'nunjucks';
+import context from './context';
+import escapeWinPath from './utils/escapeWinPath';
+
+const babelParse = require('@babel/parser').parse;
+const traverse = require('babel-traverse').default;
+const generate = require('babel-generator').default;
+
+const { join } = path;
+
+function astFunction(exportPath) {
+  if (!exportPath) return null;
+  const code = fs.readFileSync(exportPath, 'utf8');
+  const ast = babelParse(code, {
+    sourceType: 'module',
+    allowImportExportEverywhere: true,
+    plugins: [
+      'dynamicImport',
+      'jsx',
+    ],
+  });
+
+  traverse(ast, {
+    ExportNamedDeclaration(path) {
+      if (path.node.source.value.startsWith('.')) {
+        path.node.source.value = join(process.cwd(), exportPath.replace(/index.js/, '').replace(/export.js/, ''), path.node.source.value);
+      }
+    },
+    CallExpression({ node }) {
+      if (node.callee.name === 'require' && node.arguments[0].value.startsWith('.')) {
+        node.arguments[0].value = join(
+          process.cwd(),
+          exportPath.replace(/index.js/, '').replace(/export.js/, ''),
+          node.arguments[0].value,
+        );
+      }
+    },
+  });
+  return generate(ast, {}, code).code;
+}
+
+export default function generateTransfer(configEntryName) {
+  const { tmpDirPath, isDev, choerodonConfig: { master } } = context;
+
+  const transferPath = path.join(tmpDirPath, `transfer.${configEntryName}.js`);
+  const exportPath = typeof master === 'object' ? master.exportPath : undefined;
+  const content = astFunction(exportPath);
+  fs.writeFileSync(
+    transferPath,
+    content,
+  );
+}
+
+```
+
+还去掉了模板文件的选择，nice。
+
 ### 强烈推荐阅读的代码和说明
 
 看到不看完放不下系列[this super tiny compiler](https://github.com/jamiebuilds/the-super-tiny-compiler/blob/master/the-super-tiny-compiler.js)
