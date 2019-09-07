@@ -78,6 +78,8 @@ CRP包括几个关键的时间点：
 
 其中DOM树的解析会被JS给阻塞这是大家都知道的，而CSS的加载也会阻塞JS的执行，所以当CSS和JS请求和执行时，DOM的构建会被阻塞。
 
+*9月7日修改，应该是当css的请求慢于js请求时，js的执行会被css阻塞，由js导致的parse html阶段就会被延后，看起来就像两段parse html。*
+
 #### 优化CRP就是尽快使DOMContentLoaded发生
 
 因为DOMContentLoaded了之后，就会开始触发FCP和FMP，图一中的绿色，表示有内容出来了。其实更详细地说，就是RenderTree开始构建了。
